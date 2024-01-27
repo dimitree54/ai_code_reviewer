@@ -15,8 +15,8 @@ setup(
     url='https://github.com/dimitree54/ai_code_reviewer',
     classifiers=[
         'Programming Language :: Python :: 3',
-        'License :: OSI Approved :: CC BY-NC-SA License',
         'Operating System :: OS Independent',
     ],
-    install_requires=required
+    install_requires=required,
+    license='CC BY-NC-SA 4.0',
 )
