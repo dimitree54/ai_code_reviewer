@@ -1,0 +1,71 @@
+name: CI/CD
+
+on: [push, pull_request]
+
+jobs:
+  flake8:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.11
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8
+    - name: Lint with flake8
+      run: |
+        flake8
+  tests:
+    needs: flake8
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.11
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip setuptools wheel
+        pip install -r requirements.txt
+    - name: Run unittest
+      run: |
+        python -m unittest discover
+  bump-version:
+    needs: tests
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Bump version
+        uses: Clinical-Genomics/bump2version-ci@v3
+        env:
+          BUMPVERSION_TOKEN: ${{ secrets.BUMPVERSION_TOKEN }}
+          BUMPVERSION_AUTHOR: auto_bump_version
+          BUMPVERSION_EMAIL: actions@github.com
+          GITHUB_REPOSITORY: ${{ github.repository }}
+  deploy:
+    needs: bump-version
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: main
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools wheel twine
+          pip install -r requirements.txt
+      - name: Build and publish
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_PUBLISH_TOKEN }}
+        run: |
+          python setup.py sdist bdist_wheel
+          python -m twine upload dist/*
