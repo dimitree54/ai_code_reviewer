@@ -1,6 +1,5 @@
 import unittest
 from ai_code_reviewer.base import TestReviewer
-from typing import List
 
 
 class Review:
