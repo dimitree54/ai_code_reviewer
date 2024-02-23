@@ -10,6 +10,8 @@ from langchain_core.runnables import RunnableSerializable
 from pydantic import BaseModel, Field
 from yid_langchain_extensions.utils import pydantic_v1_port
 
+from ai_code_reviewer.utils import add_line_numbers
+
 
 class FilePatchComment(BaseModel):
     line_number: int  # enumeration starts from first hunk
@@ -56,14 +58,8 @@ class ProgrammingPrincipleChecker(Reviewer):
         default_factory=build_patch_review_chain
     )
 
-    def _add_line_numbers_to_patch(self, patch: str) -> str:
-        result = ""
-        for line_number, line in enumerate(patch):
-            result += f"{line_number}: {line}\n"
-        return result
-
     async def review_file_patch(self, patch: str) -> FilePatchReview:
-        enumerated_patch = self._add_line_numbers_to_patch(patch)
+        enumerated_patch = add_line_numbers(patch)
         messages = self.principle_checking_template.format_messages(
             enumerated_patch=enumerated_patch,
             principle_name=self.programming_principle.name,
