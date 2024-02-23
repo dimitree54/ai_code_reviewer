@@ -1,3 +1,5 @@
 langchain~=0.1
 pydantic>=2
-yid_langchain_extensions~=0.4.35
+yid_langchain_extensions~=0.4.36
+openai>=1,<2
+langchainhub~=0.1
