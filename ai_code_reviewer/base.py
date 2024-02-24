@@ -3,10 +3,10 @@ from typing import List, Dict
 
 from langchain import hub
 from langchain.output_parsers import PydanticOutputParser
-from langchain_community.chat_models import ChatOpenAI
 from langchain_core.messages import BaseMessage
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnableSerializable
+from langchain_openai import ChatOpenAI
 from pydantic import BaseModel as BaseModelV2, Field
 from pydantic.v1 import BaseModel as BaseModelV1
 from yid_langchain_extensions.utils import pydantic_v1_port
