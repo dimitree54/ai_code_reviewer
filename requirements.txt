@@ -4,3 +4,4 @@ yid_langchain_extensions~=0.4.36
 openai>=1,<2
 langchainhub~=0.1
 PyYAML~=6.0.1
+gitpython~=3.1.42
