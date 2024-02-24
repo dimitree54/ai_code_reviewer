@@ -26,7 +26,7 @@ def get_repo_diff_per_file(repository_path: str, other: str, allowed_extensions:
     return diffs
 
 
-async def main(repo_path: str, compare_with: str):
+async def review_repo_diff(repo_path: str, compare_with: str):
     principles_path = os.path.join(repo_path, PRINCIPLES_DIR)
     if not os.path.isdir(principles_path) or len(os.listdir(principles_path)) == 0:
         logging.error(F"No review principles found. You need to populate '{PRINCIPLES_DIR}' dir with review principles")
@@ -50,11 +50,11 @@ async def main(repo_path: str, compare_with: str):
     logging.info("Review completed")
 
 
-if __name__ == '__main__':
+def main():
     parser = argparse.ArgumentParser(description="Review code against programming principles.")
     parser.add_argument("--repo_path", type=str, required=False, default=".",
                         help="Path to the repository to review.")
     parser.add_argument("--compare_with", type=str, required=False, default="HEAD",
                         help="Base version to compare with. May be git hash or tag of source branch")
     args = parser.parse_args()
-    asyncio.run(main(args.repo_path, args.compare_with))
+    asyncio.run(review_repo_diff(args.repo_path, args.compare_with))
