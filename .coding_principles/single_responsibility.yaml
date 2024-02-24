@@ -1,5 +1,4 @@
-principle_name: |
-  Single responsibility principle
+principle_name: Single responsibility principle
 
 principle_description: |
   A class should have only one reason to change.
