@@ -7,18 +7,19 @@ from langchain_community.chat_models import ChatOpenAI
 from langchain_core.messages import BaseMessage
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnableSerializable
-from pydantic import BaseModel, Field
+from pydantic import BaseModel as BaseModelV2, Field
+from pydantic.v1 import BaseModel as BaseModelV1
 from yid_langchain_extensions.utils import pydantic_v1_port
 
 from ai_code_reviewer.utils import add_line_numbers
 
 
-class FilePatchComment(BaseModel):
+class FilePatchComment(BaseModelV1):
     line_number: int  # enumeration starts from first hunk
     comment: str
 
 
-class FilePatchReview(BaseModel):
+class FilePatchReview(BaseModelV1):
     comments: List[FilePatchComment]
 
     @property
@@ -26,12 +27,12 @@ class FilePatchReview(BaseModel):
         return len(self.comments) == 0
 
 
-class Reviewer(BaseModel, ABC):
+class Reviewer(BaseModelV2, ABC):
     async def review_file_patch(self, patch: str) -> FilePatchReview:
         pass
 
 
-class ProgrammingPrinciple(BaseModel):
+class ProgrammingPrinciple(BaseModelV2):
     name: str = Field(alias="principle_name")
     description: str = Field(alias="principle_description")
     review_required_examples: str
@@ -45,7 +46,7 @@ def build_patch_review_chain() -> RunnableSerializable[Dict, FilePatchReview]:
     )
     output_parser = PydanticOutputParser(pydantic_object=FilePatchReview)
 
-    principle_checking_template: ChatPromptTemplate = hub.pull("dimitree54/programming_principle_template")
+    principle_checking_template: ChatPromptTemplate = hub.pull("dimitree54/code_review_single_responsibility")
     principle_checking_template = principle_checking_template.partial(
         format_instructions=output_parser.get_format_instructions()
     )
@@ -60,12 +61,13 @@ class ProgrammingPrincipleChecker(Reviewer):
 
     async def review_file_patch(self, patch: str) -> FilePatchReview:
         enumerated_patch = add_line_numbers(patch)
-        messages = self.principle_checking_template.format_messages(
-            enumerated_patch=enumerated_patch,
-            principle_name=self.programming_principle.name,
-            principle_description=self.programming_principle.description,
-            review_required_examples=self.programming_principle.review_required_examples,
-            review_not_required_examples=self.programming_principle.review_not_required_examples,
+        file_patch_review: FilePatchReview = await self.patch_review_chain.ainvoke(
+            input={
+                "enumerated_patch": enumerated_patch,
+                "principle_name": self.programming_principle.name,
+                "principle_description": self.programming_principle.description,
+                "review_required_examples": self.programming_principle.review_required_examples,
+                "review_not_required_examples": self.programming_principle.review_not_required_examples
+            }
         )
-        file_patch_review: FilePatchReview = await self.patch_review_chain.ainvoke(messages)
         return file_patch_review
