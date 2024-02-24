@@ -10,19 +10,19 @@ import yaml
 from ai_code_reviewer.base import ProgrammingPrincipleChecker, ProgrammingPrinciple
 
 
-def get_repo_diff_per_file(repository_path: str, allowed_extensions: Set[str]) -> Dict[str, str]:
+def get_repo_diff_per_file(repository_path: str, other: str, allowed_extensions: Set[str]) -> Dict[str, str]:
     repo = Repo(repository_path)
     diffs = {}
-    changed_files = repo.git.diff('HEAD', name_only=True).split('\n')
+    changed_files = repo.git.diff(other, name_only=True).split('\n')
     for file in changed_files:
         if os.path.splitext(file)[1] not in allowed_extensions:
             continue
-        file_diff = repo.git.diff('HEAD', file)
+        file_diff = repo.git.diff(other, file)
         diffs[file] = file_diff
     return diffs
 
 
-async def main(repo_path: str):
+async def main(repo_path: str, compare_with: str):
     principles_path = os.path.join(repo_path, ".coding_principles")
     for principle_file_name in os.listdir(principles_path):
         _, ext = os.path.splitext(principle_file_name)
@@ -35,7 +35,7 @@ async def main(repo_path: str):
         programming_principle_checker = ProgrammingPrincipleChecker(
             programming_principle=programming_principle
         )
-        per_file_diff = get_repo_diff_per_file(repo_path, allowed_extensions={".py"})
+        per_file_diff = get_repo_diff_per_file(repo_path, compare_with, allowed_extensions={".py"})
         for file_name in per_file_diff:
             review = await programming_principle_checker.review_file_patch(per_file_diff[file_name])
             print(f"review of file {file_name}:")
@@ -46,5 +46,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Review code against programming principles.")
     parser.add_argument("--repo_path", type=str, required=True,
                         help="Path to the repository to review.")
+    parser.add_argument("--compare_with", type=str, required=False, default="HEAD",
+                        help="Base version to compare with. May be git hash or tag of source branch")
     args = parser.parse_args()
-    asyncio.run(main(args.repo_path))
+    asyncio.run(main(args.repo_path, args.compare_with))
