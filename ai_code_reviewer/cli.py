@@ -4,11 +4,22 @@ import logging
 import os
 from typing import Dict, Set
 
+import colorlog
 from git import Repo
 
 import yaml
 
 from ai_code_reviewer.base import ProgrammingPrincipleChecker, ProgrammingPrinciple
+
+
+def get_logger() -> logging.Logger:
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
+    handler = colorlog.StreamHandler()
+    handler.setFormatter(colorlog.ColoredFormatter(
+        '%(log_color)s%(levelname)s:%(name)s:%(message)s'))
+    logger.addHandler(handler)
+    return logger
 
 
 PRINCIPLES_DIR = ".coding_principles"
@@ -27,9 +38,10 @@ def get_repo_diff_per_file(repository_path: str, other: str, allowed_extensions:
 
 
 async def review_repo_diff(repo_path: str, compare_with: str):
+    logger = get_logger()
     principles_path = os.path.join(repo_path, PRINCIPLES_DIR)
     if not os.path.isdir(principles_path) or len(os.listdir(principles_path)) == 0:
-        logging.error(F"No review principles found. You need to populate '{PRINCIPLES_DIR}' dir with review principles")
+        logger.error(F"No review principles found. You need to populate '{PRINCIPLES_DIR}' dir with review principles")
         return
     for principle_file_name in os.listdir(principles_path):
         _, ext = os.path.splitext(principle_file_name)
@@ -46,8 +58,8 @@ async def review_repo_diff(repo_path: str, compare_with: str):
         for file_name in per_file_diff:
             review = await programming_principle_checker.review_file_patch(per_file_diff[file_name])
             if not review.approve:
-                logging.warning(f"Review of file {file_name}:\n{review.comments}")
-    logging.info("Review completed")
+                logger.warning(f"Review of file {file_name}:\n{review.comments}")
+    logger.info("Review completed")
 
 
 def main():
