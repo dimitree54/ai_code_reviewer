@@ -77,50 +77,6 @@ class TestProgrammingPrincipleChecker(unittest.IsolatedAsyncioTestCase):
  +                line_number=3,
  +                comment="test_review"
  +            )
- +        ]
-
-
- class ProgrammingPrinciple(BaseModel):
- +    name: str = Field(alias="principle_name")
- +    description: str = Field(alias="principle_description")
- +    review_required_examples: str
- +    review_not_required_examples: str
-
-
- class ReviewsOutputParser(StopSeqOutputParser[List[ReviewComment]]):
- +    def parse(self, text: str) -> List[ReviewComment]:
- +        pass  # todo
-
-
- class ProgrammingPrincipleChecker(Reviewer):
- -    llm: pydantic_v1_port(ChatOpenAI)
- -    programming_principle: ProgrammingPrinciple
- -    llm_output_parser: StopSeqOutputParser[List[ReviewComment]] = ReviewsOutputParser()
- -    principle_checking_template: ChatPromptTemplate = hub.pull("dimitree54/programming_principle_template")  # todo
- +        llm: pydantic_v1_port(ChatOpenAI)
- +        programming_principle: ProgrammingPrinciple
- +        llm_output_parser: StopSeqOutputParser[List[ReviewComment]] = ReviewsOutputParser()
- +        principle_checking_template: ChatPromptTemplate = hub.pull("dimitree54/programming_principle_template")  # todo
-
- -    async def review_file_changes(self, hunk_with_line_numbers: str) -> List[ReviewComment]:
- +        async def review_file_changes(self, hunk_with_line_numbers: str) -> List[ReviewComment]:
- +            messages = self.principle_checking_template.format_messages(
- +                code_diff=hunk_with_line_numbers,
- +                principle_name=self.programming_principle.name,
- +                principle_description=self.programming_principle.description,
- +                review_required_examples=self.programming_principle.review_required_examples,
- +                review_not_required_examples=self.programming_principle.review_not_required_examples,
- +                format_instructions=self.llm_output_parser.get_format_instructions()
- +            )
- +            llm_output: List[ReviewComment] = await self.llm.ainvoke(
- +                messages,
- +                stop=self.llm_output_parser.stop_sequences
- +            )
- +            return llm_output
-        """
+ +        ]"""
         reviews = await self.reviewer.review_file_patch(test_patch)
         print(reviews)
-
-
-if __name__ == '__main__':
-    unittest.main()
