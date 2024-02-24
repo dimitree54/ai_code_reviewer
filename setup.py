@@ -19,4 +19,9 @@ setup(
     ],
     install_requires=required,
     license='CC BY-NC-SA 4.0',
+    entry_points={
+        'console_scripts': [
+            'ai_code_reviewer = ai_code_reviewer.cli:main',
+        ],
+    }
 )
