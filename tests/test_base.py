@@ -56,27 +56,24 @@ class TestProgrammingPrincipleChecker(unittest.IsolatedAsyncioTestCase):
         )
 
     async def test_review(self):
-        test_patch = """
- @@ -10,20 +15,39 @@ class ReviewComment(BaseModel):
-
-
-  class Reviewer(BaseModel, ABC):
- -    def review_file_changes(self, hunk_with_line_numbers: str) -> List[ReviewComment]:
- +        pass
-
-
- class FakeReviewer(Reviewer):
- -    def review_file_changes(self, file_changes: str) -> List[ReviewComment]:
- +        return []
-
-
- class TestReviewer(Reviewer):
- -    def review_file_changes(self, file_changes: str) -> List[ReviewComment]:
- +        return [
- +            ReviewComment(
- +                line_number=3,
- +                comment="test_review"
- +            )
- +        ]"""
+        test_patch = """@@ -10,20 +15,39 @@ class ReviewComment(BaseModel):
++ class FileManager:
++     def __init__(self, filename):
++         self.path = Path(filename)
++     
++     def read(self, encoding="utf-8"):
++         return self.path.read_text(encoding)
++     
++     def write(self, data, encoding="utf-8"):
++         self.path.write_text(data, encoding)
++     
++     def compress(self):
++         with ZipFile(self.path.with_suffix(".zip"), mode="w") as archive:
++             archive.write(self.path)
++     
++     def decompress(self):
++         with ZipFile(self.path.with_suffix(".zip"), mode="r") as archive:
++             archive.extractall()
+"""
         reviews = await self.reviewer.review_file_patch(test_patch)
-        print(reviews)
+        self.assertGreater(len(reviews.comments), 0)
