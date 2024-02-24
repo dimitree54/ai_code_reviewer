@@ -34,6 +34,8 @@ jobs:
     - name: Run unittest
       run: |
         python -m unittest discover
+      env:
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
   bump-version:
     needs: tests
     if: github.ref == 'refs/heads/main'
