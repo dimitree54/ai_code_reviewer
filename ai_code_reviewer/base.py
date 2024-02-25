@@ -1,6 +1,8 @@
+import os
 from abc import ABC
 from typing import List, Dict
 
+import yaml
 from langchain import hub
 from langchain.output_parsers import PydanticOutputParser
 from langchain_core.messages import BaseMessage
@@ -15,7 +17,7 @@ from ai_code_reviewer.utils import add_line_numbers
 
 
 class FilePatchComment(BaseModelV1):
-    line_number: int  # enumeration starts from first hunk
+    line_number: int
     comment: str
 
 
@@ -71,3 +73,19 @@ class ProgrammingPrincipleChecker(Reviewer):
             }
         )
         return file_patch_review
+
+
+def load_principle_checkers(principles_path: str) -> List[ProgrammingPrincipleChecker]:
+    all_principles = []
+    for principle_file_name in os.listdir(principles_path):
+        if os.path.splitext(principle_file_name)[1] != ".yaml":
+            continue
+        full_principle_file_path = os.path.join(principles_path, principle_file_name)
+        with open(full_principle_file_path, "r") as file:
+            programming_principle_dict = yaml.safe_load(file)
+            programming_principle = ProgrammingPrinciple(**programming_principle_dict)
+        programming_principle_checker = ProgrammingPrincipleChecker(
+            programming_principle=programming_principle
+        )
+        all_principles.append(programming_principle_checker)
+    return all_principles
