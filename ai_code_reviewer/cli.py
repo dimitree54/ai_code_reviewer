@@ -88,6 +88,3 @@ def main():
         asyncio.run(review_repo_diff(args.repo_path, args.compare_with, logger))
         time_spent = time.time() - start_time
         logger.info(f"Review completed in {round(time_spent, 2)}s and {round(cb.total_cost, 2)}$")
-
-
-main()
