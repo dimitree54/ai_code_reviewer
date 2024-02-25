@@ -1,28 +1,50 @@
-Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License (CC BY-NC-SA 4.0)
+# Custom License for ai_code_reviewer
 
-Copyright (c) 2024 Dmitrii Rashchenko
+## 1. Definitions
 
-This work ("ai_code_reviewer") is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License. To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/4.0/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+- "The Software": All software included in the ai_code_reviewer project, including source code, documentation, and related materials.
+- "You": Any person or entity exercising permissions granted by this License.
+- "Commercial Use": Use of The Software in any manner primarily intended for or directed toward commercial advantage or monetary compensation.
 
-You are free to:
+## 2. Grant of Rights
 
-- **Share** — copy and redistribute the material in any medium or format
-- **Adapt** — remix, transform, and build upon the material
+### 2.1. Open Source and Non-Commercial Use
 
-The licensor cannot revoke these freedoms as long as you follow the license terms.
+Subject to the terms and conditions of this License, Dmitrii Rashchenko hereby grants you a worldwide, royalty-free, non-exclusive, perpetual license to use, reproduce, modify, display, distribute, and perform The Software for non-commercial purposes, provided that you comply with the terms set forth in this License.
 
-Under the following terms:
+### 2.2. Commercial Use
 
-- **Attribution** — You must give appropriate credit, provide a link to the license, and indicate if changes were made. You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
+Use of The Software for Commercial Use is subject to separate terms and requires a written agreement with Dmitrii Rashchenko. Please contact dimitree54@gmail.com to discuss licensing arrangements.
 
-- **NonCommercial** — You may not use the material for commercial purposes.
+## 3. Restrictions
 
-- **ShareAlike** — If you remix, transform, or build upon the material, you must distribute your contributions under the same license as the original.
+- You may not use The Software for Commercial Use without obtaining a separate license from Dmitrii Rashchenko.
+- You may not distribute modified versions of The Software under the same name or a substantially similar name as ai_code_reviewer.
+- You may not create derivative works that are substantially similar to The Software in functionality or appearance without express written permission from Dmitrii Rashchenko.
 
-- **No additional restrictions** — You may not apply legal terms or technological measures that legally restrict others from doing anything the license permits.
+## 4. Contributions
 
-Notices:
+Contributions to The Software by third parties are governed by the same terms and conditions of this License, unless otherwise agreed upon in writing by Dmitrii Rashchenko.
 
-You do not have to comply with the license for elements of the material in the public domain or where your use is permitted by an applicable exception or limitation.
+## 5. Disclaimer of Warranty
 
-No warranties are given. The license may not give you all of the permissions necessary for your intended use. For example, other rights such as publicity, privacy, or moral rights may limit how you use the material.
+The Software is provided "as is", without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose and noninfringement. In no event shall the authors or copyright holders be liable for any claim, damages or other liability, whether in an action of contract, tort or otherwise, arising from, out of or in connection with The Software or the use or other dealings in The Software.
+
+## 6. Limitation of Liability
+
+In no event and under no legal theory, whether in tort (including negligence), contract, or otherwise, unless required by applicable law (such as deliberate and grossly negligent acts) or agreed to in writing, shall any Contributor be liable to You for damages, including any direct, indirect, special, incidental, or consequential damages of any character arising as a result of this License or out of the use or inability to use The Software (including but not limited to damages for loss of goodwill, work stoppage, computer failure or malfunction, or any and all other commercial damages or losses), even if such Contributor has been advised of the possibility of such damages.
+
+## 7. General
+
+This License does not grant permission to use the trade names, trademarks, service marks, or product names of the Licensor, except as required for reasonable and customary use in describing the origin of The Software and reproducing the content of the NOTICE file.
+
+This License constitutes the entire agreement between the parties with respect to the use of The Software licensed hereunder and supersedes all prior or contemporaneous understandings regarding such subject matter.
+
+Date: 25.02.2024
+
+## Contact Information
+
+For any questions regarding this license or the terms of use for The Software, please contact:
+
+Dmitrii Rashchenko
+dimitree54@gmail.com

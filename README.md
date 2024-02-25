@@ -44,4 +44,4 @@ If you like the project you could donate you time or money for its development. 
 - [ ] PyCharm plugin
 
 # LICENSE
-You can use code review logic to review code only of non-commercial open-source projects. To use it for commercial code, contact me by email dimitree54@gmail.com
+The ai_code_reviewer is subject of custom license terms, check license file for details. But in short, you can use it to review code of only non-commercial open-source projects. To use it for commercial code, contact me by email dimitree54@gmail.com
