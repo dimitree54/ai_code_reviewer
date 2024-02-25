@@ -18,8 +18,7 @@ def get_logger() -> logging.Logger:
     logger = logging.getLogger("ai_code_reviewer")
     logger.setLevel(logging.INFO)
     handler = colorlog.StreamHandler()
-    handler.setFormatter(colorlog.ColoredFormatter(
-        '%(log_color)s%(levelname)s:%(name)s:%(message)s'))
+    handler.setFormatter(colorlog.ColoredFormatter('%(log_color)s%(message)s'))
     logger.addHandler(handler)
     return logger
 
@@ -27,14 +26,28 @@ def get_logger() -> logging.Logger:
 PRINCIPLES_DIR = ".coding_principles"
 
 
-def get_repo_diff_per_file(repository_path: str, other: str, allowed_extensions: Set[str]) -> Dict[str, str]:
+def strip_diff_header(diff_text: str) -> str:
+    result_lines = []
+    still_header = True
+    for line in diff_text.splitlines():
+        if still_header:
+            if "@@" in line:
+                still_header = False
+            continue
+        result_lines.append(line)
+    return "\n".join(result_lines)
+
+
+def get_files_diff(repository_path: str, other: str, allowed_extensions: Set[str]) -> Dict[str, str]:
     repo = Repo(repository_path)
     diffs = {}
+
     changed_files = repo.git.diff(other, name_only=True).split('\n')
     for file in changed_files:
         if os.path.splitext(file)[1] not in allowed_extensions:
             continue
-        file_diff = repo.git.diff(other, file)
+        file_diff = repo.git.diff(other, file, unified=100000000)
+        file_diff = strip_diff_header(file_diff)
         diffs[file] = file_diff
     return diffs
 
@@ -44,6 +57,7 @@ async def review_repo_diff(repo_path: str, compare_with: str, logger: logging.Lo
     if not os.path.isdir(principles_path) or len(os.listdir(principles_path)) == 0:
         logger.error(F"No review principles found. You need to populate '{PRINCIPLES_DIR}' dir with review principles")
         return
+    per_file_diff = get_files_diff(repo_path, compare_with, allowed_extensions={".py"})
     for principle_file_name in os.listdir(principles_path):
         _, ext = os.path.splitext(principle_file_name)
         if ext != ".yaml":
@@ -55,11 +69,10 @@ async def review_repo_diff(repo_path: str, compare_with: str, logger: logging.Lo
         programming_principle_checker = ProgrammingPrincipleChecker(
             programming_principle=programming_principle
         )
-        per_file_diff = get_repo_diff_per_file(repo_path, compare_with, allowed_extensions={".py"})
         for file_name in per_file_diff:
             review = await programming_principle_checker.review_file_patch(per_file_diff[file_name])
-            if not review.approve:
-                logger.warning(f"Review of file {file_name}:\n{review.comments}")
+            for comment in review.comments:
+                logger.warning(f"./{file_name}:{comment.line_number + 1}: {comment.comment}")
 
 
 def main():
@@ -75,3 +88,6 @@ def main():
         asyncio.run(review_repo_diff(args.repo_path, args.compare_with, logger))
         time_spent = time.time() - start_time
         logger.info(f"Review completed in {round(time_spent, 2)}s and {round(cb.total_cost, 2)}$")
+
+
+main()
