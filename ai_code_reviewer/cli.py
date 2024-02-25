@@ -3,15 +3,13 @@ import asyncio
 import logging
 import os
 import time
-from typing import Dict, Set
+from typing import Tuple, Set
 
 import colorlog
-from git import Repo
-
-import yaml
 from langchain_community.callbacks import get_openai_callback
 
-from ai_code_reviewer.base import ProgrammingPrincipleChecker, ProgrammingPrinciple
+from ai_code_reviewer.base import ProgrammingPrincipleChecker, FilePatchReview, load_principle_checkers
+from ai_code_reviewer.utils import get_files_diff
 
 
 def get_logger() -> logging.Logger:
@@ -23,56 +21,47 @@ def get_logger() -> logging.Logger:
     return logger
 
 
-PRINCIPLES_DIR = ".coding_principles"
+async def run_principle_checker(
+        programming_principle_checker: ProgrammingPrincipleChecker, file_name: str, file_diff: str
+) -> Tuple[ProgrammingPrincipleChecker, str, FilePatchReview]:
+    review = await programming_principle_checker.review_file_patch(file_diff)
+    return programming_principle_checker, file_name, review
 
 
-def strip_diff_header(diff_text: str) -> str:
-    result_lines = []
-    still_header = True
-    for line in diff_text.splitlines():
-        if still_header:
-            if "@@" in line:
-                still_header = False
-            continue
-        result_lines.append(line)
-    return "\n".join(result_lines)
-
-
-def get_files_diff(repository_path: str, other: str, allowed_extensions: Set[str]) -> Dict[str, str]:
-    repo = Repo(repository_path)
-    diffs = {}
-
-    changed_files = repo.git.diff(other, name_only=True).split('\n')
-    for file in changed_files:
-        if os.path.splitext(file)[1] not in allowed_extensions:
-            continue
-        file_diff = repo.git.diff(other, file, unified=100000000)
-        file_diff = strip_diff_header(file_diff)
-        diffs[file] = file_diff
-    return diffs
-
-
-async def review_repo_diff(repo_path: str, compare_with: str, logger: logging.Logger):
-    principles_path = os.path.join(repo_path, PRINCIPLES_DIR)
+async def review_repo_diff(
+        repo_path: str,
+        principles_dir_name: str,
+        allowed_extensions: Set[str],
+        compare_with: str,
+        logger: logging.Logger
+):
+    principles_path = os.path.join(repo_path, principles_dir_name)
     if not os.path.isdir(principles_path) or len(os.listdir(principles_path)) == 0:
-        logger.error(F"No review principles found. You need to populate '{PRINCIPLES_DIR}' dir with review principles")
+        logger.error(
+            F"No review principles found. You need to populate '{principles_dir_name}' dir with review principles. "
+            F"More information: https://github.com/dimitree54/ai_code_reviewer/blob/main/README.md")
         return
-    per_file_diff = get_files_diff(repo_path, compare_with, allowed_extensions={".py"})
-    for principle_file_name in os.listdir(principles_path):
-        _, ext = os.path.splitext(principle_file_name)
-        if ext != ".yaml":
-            continue
-        full_principle_file_path = os.path.join(principles_path, principle_file_name)
-        with open(full_principle_file_path, "r") as file:
-            programming_principle_dict = yaml.safe_load(file)
-            programming_principle = ProgrammingPrinciple(**programming_principle_dict)
-        programming_principle_checker = ProgrammingPrincipleChecker(
-            programming_principle=programming_principle
-        )
-        for file_name in per_file_diff:
-            review = await programming_principle_checker.review_file_patch(per_file_diff[file_name])
-            for comment in review.comments:
-                logger.warning(f"./{file_name}:{comment.line_number + 1}: {comment.comment}")
+    all_reviewers = load_principle_checkers(principles_path)
+
+    per_file_diff = get_files_diff(repo_path, compare_with)
+    per_file_diff = {
+        file_name: file_diff for file_name, file_diff in per_file_diff.items()
+        if os.path.splitext(file_name)[1] in allowed_extensions
+    }
+
+    coroutines = []
+    for reviewer in all_reviewers:
+        for file_name, file_diff in per_file_diff.items():
+            coroutines.append(run_principle_checker(reviewer, file_name, file_diff))
+
+    per_file_reviews = await asyncio.gather(*coroutines)
+    for reviewer, file_name, review in per_file_reviews:
+        for comment in review.comments:
+            logger.warning(
+                f"./{file_name}:{comment.line_number + 1}: "
+                f"{reviewer.programming_principle.name} warning: "
+                f"{comment.comment}"
+            )
 
 
 def main():
@@ -83,8 +72,14 @@ def main():
     parser.add_argument("--compare_with", type=str, required=False, default="HEAD",
                         help="Base version to compare with. May be git hash or tag of source branch")
     args = parser.parse_args()
-    with get_openai_callback() as cb:
+
+    principles_dir_name = ".coding_principles"
+    allowed_extensions = {".py"}
+
+    with get_openai_callback() as cb:  # noqa
         start_time = time.time()
-        asyncio.run(review_repo_diff(args.repo_path, args.compare_with, logger))
+        asyncio.run(review_repo_diff(
+            args.repo_path, principles_dir_name, allowed_extensions, args.compare_with, logger
+        ))
         time_spent = time.time() - start_time
         logger.info(f"Review completed in {round(time_spent, 2)}s and {round(cb.total_cost, 2)}$")
