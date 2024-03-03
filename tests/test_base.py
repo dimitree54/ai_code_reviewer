@@ -3,8 +3,10 @@ from pathlib import Path
 
 import yaml
 
-from ai_code_reviewer.base import Reviewer, ProgrammingPrincipleChecker, ProgrammingPrinciple, FilePatchReview, \
+from ai_code_reviewer.review import FilePatchReview, \
     FilePatchComment
+from ai_code_reviewer.reviewers.base import Reviewer
+from ai_code_reviewer.reviewers.programming_principle import ProgrammingPrinciple, ProgrammingPrincipleChecker
 from ai_code_reviewer.utils import add_line_numbers
 
 
