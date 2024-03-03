@@ -42,6 +42,3 @@ If you like the project you could donate you time or money for its development. 
 - [ ] GitHub pull request reviewer bot
 - [ ] GitLab merge request reviewer bot
 - [ ] PyCharm plugin
-
-# LICENSE
-The ai_code_reviewer is subject of custom license terms, check license file for details. But in short, you can use it to review code of only non-commercial open-source projects. To use it for commercial code, contact me by email dimitree54@gmail.com
