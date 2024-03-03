@@ -3,6 +3,7 @@ from pathlib import Path
 
 import yaml
 
+from ai_code_reviewer.container import build_patch_review_chain
 from ai_code_reviewer.review import FilePatchReview, \
     FilePatchComment
 from ai_code_reviewer.reviewers.base import Reviewer
@@ -54,7 +55,8 @@ class TestProgrammingPrincipleChecker(unittest.IsolatedAsyncioTestCase):
             programming_principle_dict = yaml.safe_load(file)
             programming_principle = ProgrammingPrinciple(**programming_principle_dict)
         self.reviewer = ProgrammingPrincipleReviewer(
-            programming_principle=programming_principle
+            programming_principle=programming_principle,
+            patch_review_chain=build_patch_review_chain()
         )
 
     async def test_review(self):

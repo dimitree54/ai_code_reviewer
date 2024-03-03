@@ -36,7 +36,8 @@ def load_principle_checkers(principles_path: str) -> List[ProgrammingPrincipleRe
             programming_principle_dict = yaml.safe_load(file)
             programming_principle = ProgrammingPrinciple(**programming_principle_dict)
         programming_principle_checker = ProgrammingPrincipleReviewer(
-            programming_principle=programming_principle
+            programming_principle=programming_principle,
+            patch_review_chain=build_patch_review_chain()
         )
         all_principles.append(programming_principle_checker)
     return all_principles

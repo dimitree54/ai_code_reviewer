@@ -6,7 +6,6 @@ from pydantic import BaseModel as BaseModelV2, Field
 from yid_langchain_extensions.utils import pydantic_v1_port
 
 from ai_code_reviewer.review import FilePatchReview
-from ai_code_reviewer.container import build_patch_review_chain
 from ai_code_reviewer.reviewers.base import Reviewer
 from ai_code_reviewer.utils import add_line_numbers
 
@@ -20,9 +19,7 @@ class ProgrammingPrinciple(BaseModelV2):
 
 class ProgrammingPrincipleReviewer(Reviewer):
     programming_principle: ProgrammingPrinciple
-    patch_review_chain: pydantic_v1_port(RunnableSerializable[List[BaseMessage], FilePatchReview]) = Field(
-        default_factory=build_patch_review_chain
-    )
+    patch_review_chain: pydantic_v1_port(RunnableSerializable[List[BaseMessage], FilePatchReview])
 
     async def review_file_patch(self, patch: str) -> FilePatchReview:
         enumerated_patch = add_line_numbers(patch)
