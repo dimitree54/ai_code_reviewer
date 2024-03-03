@@ -18,7 +18,7 @@ setup(
         'Operating System :: OS Independent',
     ],
     install_requires=required,
-    license='Custom License',
+    license='MIT',
     entry_points={
         'console_scripts': [
             'ai_code_reviewer = ai_code_reviewer.cli:main',
