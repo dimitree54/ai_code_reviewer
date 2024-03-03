@@ -1,50 +1,21 @@
-# Custom License for ai_code_reviewer
+MIT License
 
-## 1. Definitions
+Copyright (c) 2024 Dmitrii Rashchenko
 
-- "The Software": All software included in the ai_code_reviewer project, including source code, documentation, and related materials.
-- "You": Any person or entity exercising permissions granted by this License.
-- "Commercial Use": Use of The Software in any manner primarily intended for or directed toward commercial advantage or monetary compensation.
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-## 2. Grant of Rights
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-### 2.1. Open Source and Non-Commercial Use
-
-Subject to the terms and conditions of this License, Dmitrii Rashchenko hereby grants you a worldwide, royalty-free, non-exclusive, perpetual license to use, reproduce, modify, display, distribute, and perform The Software for non-commercial purposes, provided that you comply with the terms set forth in this License.
-
-### 2.2. Commercial Use
-
-Use of The Software for Commercial Use is subject to separate terms and requires a written agreement with Dmitrii Rashchenko. Please contact dimitree54@gmail.com to discuss licensing arrangements.
-
-## 3. Restrictions
-
-- You may not use The Software for Commercial Use without obtaining a separate license from Dmitrii Rashchenko.
-- You may not distribute modified versions of The Software under the same name or a substantially similar name as ai_code_reviewer.
-- You may not create derivative works that are substantially similar to The Software in functionality or appearance without express written permission from Dmitrii Rashchenko.
-
-## 4. Contributions
-
-Contributions to The Software by third parties are governed by the same terms and conditions of this License, unless otherwise agreed upon in writing by Dmitrii Rashchenko.
-
-## 5. Disclaimer of Warranty
-
-The Software is provided "as is", without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose and noninfringement. In no event shall the authors or copyright holders be liable for any claim, damages or other liability, whether in an action of contract, tort or otherwise, arising from, out of or in connection with The Software or the use or other dealings in The Software.
-
-## 6. Limitation of Liability
-
-In no event and under no legal theory, whether in tort (including negligence), contract, or otherwise, unless required by applicable law (such as deliberate and grossly negligent acts) or agreed to in writing, shall any Contributor be liable to You for damages, including any direct, indirect, special, incidental, or consequential damages of any character arising as a result of this License or out of the use or inability to use The Software (including but not limited to damages for loss of goodwill, work stoppage, computer failure or malfunction, or any and all other commercial damages or losses), even if such Contributor has been advised of the possibility of such damages.
-
-## 7. General
-
-This License does not grant permission to use the trade names, trademarks, service marks, or product names of the Licensor, except as required for reasonable and customary use in describing the origin of The Software and reproducing the content of the NOTICE file.
-
-This License constitutes the entire agreement between the parties with respect to the use of The Software licensed hereunder and supersedes all prior or contemporaneous understandings regarding such subject matter.
-
-Date: 25.02.2024
-
-## Contact Information
-
-For any questions regarding this license or the terms of use for The Software, please contact:
-
-Dmitrii Rashchenko
-dimitree54@gmail.com
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
