@@ -6,7 +6,7 @@ import yaml
 from ai_code_reviewer.review import FilePatchReview, \
     FilePatchComment
 from ai_code_reviewer.reviewers.base import Reviewer
-from ai_code_reviewer.reviewers.programming_principle import ProgrammingPrinciple, ProgrammingPrincipleChecker
+from ai_code_reviewer.reviewers.programming_principle import ProgrammingPrinciple, ProgrammingPrincipleReviewer
 from ai_code_reviewer.utils import add_line_numbers
 
 
@@ -53,7 +53,7 @@ class TestProgrammingPrincipleChecker(unittest.IsolatedAsyncioTestCase):
         with open(principle_path, "r") as file:
             programming_principle_dict = yaml.safe_load(file)
             programming_principle = ProgrammingPrinciple(**programming_principle_dict)
-        self.reviewer = ProgrammingPrincipleChecker(
+        self.reviewer = ProgrammingPrincipleReviewer(
             programming_principle=programming_principle
         )
 

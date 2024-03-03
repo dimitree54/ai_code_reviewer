@@ -9,7 +9,7 @@ from langchain_core.runnables import RunnableSerializable
 from langchain_openai import ChatOpenAI
 
 from ai_code_reviewer.review import FilePatchReview
-from ai_code_reviewer.reviewers.programming_principle import ProgrammingPrincipleChecker, ProgrammingPrinciple
+from ai_code_reviewer.reviewers.programming_principle import ProgrammingPrincipleReviewer, ProgrammingPrinciple
 
 
 def build_patch_review_chain() -> RunnableSerializable[Dict, FilePatchReview]:
@@ -26,7 +26,7 @@ def build_patch_review_chain() -> RunnableSerializable[Dict, FilePatchReview]:
     return principle_checking_template | llm | output_parser
 
 
-def load_principle_checkers(principles_path: str) -> List[ProgrammingPrincipleChecker]:
+def load_principle_checkers(principles_path: str) -> List[ProgrammingPrincipleReviewer]:
     all_principles = []
     for principle_file_name in os.listdir(principles_path):
         if os.path.splitext(principle_file_name)[1] != ".yaml":
@@ -35,7 +35,7 @@ def load_principle_checkers(principles_path: str) -> List[ProgrammingPrincipleCh
         with open(full_principle_file_path, "r") as file:
             programming_principle_dict = yaml.safe_load(file)
             programming_principle = ProgrammingPrinciple(**programming_principle_dict)
-        programming_principle_checker = ProgrammingPrincipleChecker(
+        programming_principle_checker = ProgrammingPrincipleReviewer(
             programming_principle=programming_principle
         )
         all_principles.append(programming_principle_checker)

@@ -18,7 +18,7 @@ class ProgrammingPrinciple(BaseModelV2):
     review_not_required_examples: str
 
 
-class ProgrammingPrincipleChecker(Reviewer):
+class ProgrammingPrincipleReviewer(Reviewer):
     programming_principle: ProgrammingPrinciple
     patch_review_chain: pydantic_v1_port(RunnableSerializable[List[BaseMessage], FilePatchReview]) = Field(
         default_factory=build_patch_review_chain
