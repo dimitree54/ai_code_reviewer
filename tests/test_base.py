@@ -48,7 +48,12 @@ class MyTestCase(unittest.IsolatedAsyncioTestCase):
 class TestProgrammingPrincipleReviewer(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
         principle_path = Path(__file__).parents[1] / ".coding_principles" / "single_responsibility.yaml"
-        container = Container.from_config(AppConfig(principles_path=[principle_path]))
+        container = Container.from_config(
+            AppConfig(
+                principles_path=[principle_path],
+                llm_model_name="gpt-3.5-turbo"
+            )
+        )
         self.reviewer = container.reviewers()[0]
 
     async def test_review(self):
