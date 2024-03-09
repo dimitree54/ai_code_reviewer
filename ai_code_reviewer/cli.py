@@ -26,8 +26,11 @@ def get_logger() -> logging.Logger:
 async def run_principle_checker(
         programming_principle_checker: ProgrammingPrincipleReviewer, file_name: str, file_diff: str
 ) -> Tuple[ProgrammingPrincipleReviewer, str, FilePatchReview]:
-    review = await programming_principle_checker.review_file_patch(file_diff)
-    return programming_principle_checker, file_name, review
+    try:
+        review = await programming_principle_checker.review_file_diff(file_diff)
+        return programming_principle_checker, file_name, review
+    except:
+        return programming_principle_checker, file_name, FilePatchReview(comments=[])
 
 
 async def review_repo_diff(
