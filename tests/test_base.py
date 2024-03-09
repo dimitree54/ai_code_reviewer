@@ -79,5 +79,10 @@ class TestProgrammingPrincipleChecker(unittest.IsolatedAsyncioTestCase):
 +         with ZipFile(self.path.with_suffix(".zip"), mode="r") as archive:
 +             archive.extractall()
 """
-        reviews = await self.reviewer.review_file_patch(test_patch)
+        reviews = await self.reviewer.review_file_diff(test_patch)
         self.assertGreater(len(reviews.comments), 0)
+
+    async def test_empty_review(self):
+        test_patch = """"""
+        reviews = await self.reviewer.review_file_diff(test_patch)
+        self.assertEqual(len(reviews.comments), 0)
