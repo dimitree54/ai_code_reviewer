@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Dict, List, Self
+from typing import Dict, List
 
 import yaml
 from dependency_injector.containers import DeclarativeContainer
