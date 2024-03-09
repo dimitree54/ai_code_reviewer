@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Self
 
 import yaml
 from dependency_injector.containers import DeclarativeContainer
@@ -36,11 +36,14 @@ class AppConfig(BaseModel):
 
 
 class Container(DeclarativeContainer):
-    def __init__(self, config: AppConfig):
-        super().__init__()
-        self.config.override(config.dict())
+    @staticmethod
+    def from_config(app_config: AppConfig) -> "Container":
+        container = Container()
+        container.config.from_dict(app_config.model_dump())
+        return container
 
-    config: Configuration = Configuration()
+    config = Configuration()
+
     llm: Factory[ChatOpenAI] = Factory(
         ChatOpenAI, model_name=config.llm_model_name, temperature=config.llm_model_temperature)
     llm_review_parser: Factory[PydanticOutputParser] = Factory(PydanticOutputParser, pydantic_object=FileDiffReview)

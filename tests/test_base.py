@@ -48,8 +48,8 @@ class MyTestCase(unittest.IsolatedAsyncioTestCase):
 class TestProgrammingPrincipleChecker(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
         principle_path = Path(__file__).parents[1] / ".coding_principles" / "single_responsibility.yaml"
-        container = Container(config=AppConfig(principles_path=[principle_path]))
-        self.reviewer = container.reviewers[0]
+        container = Container.from_config(AppConfig(principles_path=[principle_path]))
+        self.reviewer = container.reviewers()[0]
 
     async def test_review(self):
         test_diff = """+ class FileManager:
