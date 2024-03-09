@@ -44,7 +44,7 @@ async def review_repo_diff(
     principles_path = os.path.join(repo_path, principles_dir_name)
     all_principles_path = [
         Path(principle_path) for principle_path in os.listdir(principles_path)
-        if os.path.splitext(principles_path)[1] in allowed_extensions
+        if os.path.splitext(principles_path)[1] == ".yaml"
     ]
     if len(all_principles_path) == 0:
         logger.error(
