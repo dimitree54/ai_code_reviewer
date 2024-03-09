@@ -3,9 +3,9 @@ from typing import Dict
 from git import Repo
 
 
-def add_line_numbers(patch: str) -> str:
+def add_line_numbers(diff: str) -> str:
     result = ""
-    for line_number, line in enumerate(patch.splitlines()):
+    for line_number, line in enumerate(diff.splitlines()):
         result += f"{line_number}: {line}\n"
     return result
 

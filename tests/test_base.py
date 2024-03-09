@@ -1,13 +1,10 @@
 import unittest
 from pathlib import Path
 
-import yaml
-
-from ai_code_reviewer.container import build_patch_review_chain
-from ai_code_reviewer.review import FilePatchReview, \
-    FilePatchComment
+from ai_code_reviewer.containers import Container, AppConfig
+from ai_code_reviewer.review import FileDiffReview, \
+    FileDiffComment
 from ai_code_reviewer.reviewers.base import Reviewer
-from ai_code_reviewer.reviewers.programming_principle import ProgrammingPrinciple, ProgrammingPrincipleReviewer
 from ai_code_reviewer.utils import add_line_numbers
 
 
@@ -25,10 +22,10 @@ class TestAddLineNumbers(unittest.TestCase):
 
 
 class TestReviewer(Reviewer):
-    async def review_file_patch(self, patch: str) -> FilePatchReview:
-        return FilePatchReview(
+    async def review_file_diff(self, diff: str) -> FileDiffReview:
+        return FileDiffReview(
             comments=[
-                FilePatchComment(
+                FileDiffComment(
                     line_number=3,
                     comment="test_review"
                 )
@@ -42,26 +39,20 @@ class MyTestCase(unittest.IsolatedAsyncioTestCase):
 
     async def test_reviewer(self):
         test_changes = "Some test changes"
-        patch_review = await self.test_reviewer.review_file_patch(test_changes)
-        self.assertEqual(len(patch_review.comments), 1)
-        self.assertEqual(patch_review.comments[0].line_number, 3)
-        self.assertEqual(patch_review.comments[0].comment, "test_review")
+        review = await self.test_reviewer.review_file_diff(test_changes)
+        self.assertEqual(len(review.comments), 1)
+        self.assertEqual(review.comments[0].line_number, 3)
+        self.assertEqual(review.comments[0].comment, "test_review")
 
 
 class TestProgrammingPrincipleChecker(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
         principle_path = Path(__file__).parents[1] / ".coding_principles" / "single_responsibility.yaml"
-        with open(principle_path, "r") as file:
-            programming_principle_dict = yaml.safe_load(file)
-            programming_principle = ProgrammingPrinciple(**programming_principle_dict)
-        self.reviewer = ProgrammingPrincipleReviewer(
-            programming_principle=programming_principle,
-            patch_review_chain=build_patch_review_chain()
-        )
+        container = Container.from_config(AppConfig(principles_path=[principle_path]))
+        self.reviewer = container.reviewers()[0]
 
     async def test_review(self):
-        test_patch = """@@ -10,20 +15,39 @@ class ReviewComment(BaseModel):
-+ class FileManager:
+        test_diff = """+ class FileManager:
 +     def __init__(self, filename):
 +         self.path = Path(filename)
 +
@@ -79,10 +70,10 @@ class TestProgrammingPrincipleChecker(unittest.IsolatedAsyncioTestCase):
 +         with ZipFile(self.path.with_suffix(".zip"), mode="r") as archive:
 +             archive.extractall()
 """
-        reviews = await self.reviewer.review_file_diff(test_patch)
+        reviews = await self.reviewer.review_file_diff(test_diff)
         self.assertGreater(len(reviews.comments), 0)
 
     async def test_empty_review(self):
-        test_patch = """"""
-        reviews = await self.reviewer.review_file_diff(test_patch)
+        test_diff = """"""
+        reviews = await self.reviewer.review_file_diff(test_diff)
         self.assertEqual(len(reviews.comments), 0)
