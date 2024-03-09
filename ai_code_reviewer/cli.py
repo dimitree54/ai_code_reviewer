@@ -8,7 +8,9 @@ from typing import Tuple, Set
 import colorlog
 from langchain_community.callbacks import get_openai_callback
 
-from ai_code_reviewer.base import ProgrammingPrincipleChecker, FilePatchReview, load_principle_checkers
+from ai_code_reviewer.review import FilePatchReview
+from ai_code_reviewer.container import load_principle_checkers
+from ai_code_reviewer.reviewers.programming_principle import ProgrammingPrincipleReviewer
 from ai_code_reviewer.utils import get_files_diff
 
 
@@ -22,8 +24,8 @@ def get_logger() -> logging.Logger:
 
 
 async def run_principle_checker(
-        programming_principle_checker: ProgrammingPrincipleChecker, file_name: str, file_diff: str
-) -> Tuple[ProgrammingPrincipleChecker, str, FilePatchReview]:
+        programming_principle_checker: ProgrammingPrincipleReviewer, file_name: str, file_diff: str
+) -> Tuple[ProgrammingPrincipleReviewer, str, FilePatchReview]:
     review = await programming_principle_checker.review_file_patch(file_diff)
     return programming_principle_checker, file_name, review
 
