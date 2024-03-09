@@ -3,7 +3,7 @@ from pathlib import Path
 
 import yaml
 
-from ai_code_reviewer.container import build_patch_review_chain
+from ai_code_reviewer.containers import build_patch_review_chain
 from ai_code_reviewer.review import FilePatchReview, \
     FilePatchComment
 from ai_code_reviewer.reviewers.base import Reviewer

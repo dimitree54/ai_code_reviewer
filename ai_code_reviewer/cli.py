@@ -9,7 +9,7 @@ import colorlog
 from langchain_community.callbacks import get_openai_callback
 
 from ai_code_reviewer.review import FilePatchReview
-from ai_code_reviewer.container import load_principle_checkers
+from ai_code_reviewer.containers import load_principle_checkers
 from ai_code_reviewer.reviewers.programming_principle import ProgrammingPrincipleReviewer
 from ai_code_reviewer.utils import get_files_diff
 
