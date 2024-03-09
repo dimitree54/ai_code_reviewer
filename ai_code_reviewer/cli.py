@@ -29,7 +29,7 @@ async def run_principle_checker(
     try:
         review = await programming_principle_checker.review_file_diff(file_diff)
         return programming_principle_checker, file_name, review
-    except:
+    except Exception:
         return programming_principle_checker, file_name, FilePatchReview(comments=[])
 
 
