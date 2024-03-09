@@ -21,10 +21,10 @@ class ProgrammingPrincipleReviewer(Reviewer):
     programming_principle: ProgrammingPrinciple
     patch_review_chain: pydantic_v1_port(RunnableSerializable[List[BaseMessage], FilePatchReview])
 
-    async def review_file_patch(self, patch: str) -> FilePatchReview:
-        if len(patch) == 0:
+    async def review_file_diff(self, diff: str) -> FilePatchReview:
+        if len(diff) == 0:
             return FilePatchReview(comments=[])
-        enumerated_patch = add_line_numbers(patch)
+        enumerated_patch = add_line_numbers(diff)
         file_patch_review: FilePatchReview = await self.patch_review_chain.ainvoke(
             input={
                 "enumerated_patch": enumerated_patch,
