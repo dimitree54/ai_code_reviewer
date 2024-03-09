@@ -30,7 +30,7 @@ async def run_principle_reviewer(
     try:
         review = await programming_principle_reviewer.review_file_diff(file_diff)
         return programming_principle_reviewer, file_name, review
-    except Exception:
+    except Exception:  # noqa
         return programming_principle_reviewer, file_name, FileDiffReview(comments=[])
 
 
