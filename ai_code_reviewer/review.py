@@ -3,13 +3,13 @@ from typing import List
 from pydantic.v1 import BaseModel as BaseModelV1
 
 
-class FilePatchComment(BaseModelV1):
+class FileDiffComment(BaseModelV1):
     line_number: int
     comment: str
 
 
-class FilePatchReview(BaseModelV1):
-    comments: List[FilePatchComment]
+class FileDiffReview(BaseModelV1):
+    comments: List[FileDiffComment]
 
     @property
     def approve(self) -> bool:

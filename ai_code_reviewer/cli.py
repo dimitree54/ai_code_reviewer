@@ -3,13 +3,14 @@ import asyncio
 import logging
 import os
 import time
+from pathlib import Path
 from typing import Tuple, Set
 
 import colorlog
 from langchain_community.callbacks import get_openai_callback
 
-from ai_code_reviewer.review import FilePatchReview
-from ai_code_reviewer.container import load_principle_checkers
+from ai_code_reviewer.containers import Container, AppConfig
+from ai_code_reviewer.review import FileDiffReview
 from ai_code_reviewer.reviewers.programming_principle import ProgrammingPrincipleReviewer
 from ai_code_reviewer.utils import get_files_diff
 
@@ -25,12 +26,12 @@ def get_logger() -> logging.Logger:
 
 async def run_principle_checker(
         programming_principle_checker: ProgrammingPrincipleReviewer, file_name: str, file_diff: str
-) -> Tuple[ProgrammingPrincipleReviewer, str, FilePatchReview]:
+) -> Tuple[ProgrammingPrincipleReviewer, str, FileDiffReview]:
     try:
         review = await programming_principle_checker.review_file_diff(file_diff)
         return programming_principle_checker, file_name, review
     except Exception:
-        return programming_principle_checker, file_name, FilePatchReview(comments=[])
+        return programming_principle_checker, file_name, FileDiffReview(comments=[])
 
 
 async def review_repo_diff(
@@ -41,12 +42,16 @@ async def review_repo_diff(
         logger: logging.Logger
 ):
     principles_path = os.path.join(repo_path, principles_dir_name)
-    if not os.path.isdir(principles_path) or len(os.listdir(principles_path)) == 0:
+    all_principles_path = [
+        Path(principle_path) for principle_path in os.listdir(principles_path)
+        if os.path.splitext(principles_path)[1] == ".yaml"
+    ]
+    if len(all_principles_path) == 0:
         logger.error(
             F"No review principles found. You need to populate '{principles_dir_name}' dir with review principles. "
             F"More information: https://github.com/dimitree54/ai_code_reviewer/blob/main/README.md")
         return
-    all_reviewers = load_principle_checkers(principles_path)
+    container = Container(config=AppConfig(principles_path=all_principles_path))
 
     per_file_diff = get_files_diff(repo_path, compare_with)
     per_file_diff = {
@@ -55,7 +60,7 @@ async def review_repo_diff(
     }
 
     coroutines = []
-    for reviewer in all_reviewers:
+    for reviewer in container.reviewers():
         for file_name, file_diff in per_file_diff.items():
             coroutines.append(run_principle_checker(reviewer, file_name, file_diff))
 
