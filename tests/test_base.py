@@ -45,7 +45,7 @@ class MyTestCase(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(review.comments[0].comment, "test_review")
 
 
-class TestProgrammingPrincipleChecker(unittest.IsolatedAsyncioTestCase):
+class TestProgrammingPrincipleReviewer(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
         principle_path = Path(__file__).parents[1] / ".coding_principles" / "single_responsibility.yaml"
         container = Container.from_config(AppConfig(principles_path=[principle_path]))
