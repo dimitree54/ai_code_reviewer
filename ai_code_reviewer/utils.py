@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Dict
 
 from git import Repo
@@ -22,7 +23,7 @@ def strip_diff_header(diff_text: str) -> str:
     return "\n".join(result_lines)
 
 
-def get_files_diff(repository_path: str, other: str) -> Dict[str, str]:
+def get_files_diff(repository_path: Path, other: str) -> Dict[str, str]:
     repo = Repo(repository_path)
     diffs = {}
 
