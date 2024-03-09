@@ -78,10 +78,9 @@ def main():
                         help='List of file extensions to review')
     args = parser.parse_args()
 
+    more_info_link = "More information: https://github.com/dimitree54/ai_code_reviewer/blob/main/README.md"
     if "OPENAI_API_KEY" not in os.environ:
-        logger.error(
-            F"No OPENAI_API_KEY found. "
-            F"More information: https://github.com/dimitree54/ai_code_reviewer/blob/main/README.md")
+        logger.error(f"No OPENAI_API_KEY found. {more_info_link}")
         return
 
     repo_path = Path(args.repo_path)
@@ -94,8 +93,8 @@ def main():
     ]
     if len(all_principles_path) == 0:
         logger.error(
-            F"No review principles found. You need to populate '{coding_principles_path}' dir with review principles. "
-            F"More information: https://github.com/dimitree54/ai_code_reviewer/blob/main/README.md")
+            f"No review principles found. You need to populate '{coding_principles_path}' dir with review principles."
+            f" {more_info_link}")
         return
     app_config = AppConfig(
         llm_model_name=args.openai_model_name,
