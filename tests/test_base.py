@@ -81,3 +81,8 @@ class TestProgrammingPrincipleChecker(unittest.IsolatedAsyncioTestCase):
 """
         reviews = await self.reviewer.review_file_patch(test_patch)
         self.assertGreater(len(reviews.comments), 0)
+
+    async def test_empty_review(self):
+        test_patch = """"""
+        reviews = await self.reviewer.review_file_patch(test_patch)
+        self.assertEqual(len(reviews.comments), 0)

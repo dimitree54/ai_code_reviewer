@@ -22,6 +22,8 @@ class ProgrammingPrincipleReviewer(Reviewer):
     patch_review_chain: pydantic_v1_port(RunnableSerializable[List[BaseMessage], FilePatchReview])
 
     async def review_file_patch(self, patch: str) -> FilePatchReview:
+        if len(patch) == 0:
+            return FilePatchReview(comments=[])
         enumerated_patch = add_line_numbers(patch)
         file_patch_review: FilePatchReview = await self.patch_review_chain.ainvoke(
             input={
