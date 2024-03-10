@@ -90,7 +90,7 @@ class TestCLI(unittest.TestCase):
         fake_repo_file_path = self.repo_path / "fake_repo_file.py"
         with open(fake_repo_file_path, "w") as fake_repo_file:
             fake_repo_file.write(self.test_diff)
-        result = subprocess.run([
+        subprocess.run([
             'git', 'add', str(fake_repo_file_path),
         ], capture_output=True, text=True)
         result = subprocess.run([
