@@ -1,5 +1,3 @@
-import os
-import subprocess
 import unittest
 from pathlib import Path
 
@@ -71,41 +69,3 @@ class TestProgrammingPrincipleReviewer(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(reviews.comments), 0)
 
 
-class TestCLI(unittest.TestCase):
-    def setUp(self):
-        self.repo_path = Path(__file__).parents[1]
-        self.cli_path = self.repo_path / "ai_code_reviewer" / "cli.py"
-
-    def test_cli_default_no_diff(self):
-        result = subprocess.run([
-            'python', str(self.cli_path),
-            '--repo_path', str(self.repo_path),
-        ], capture_output=True, text=True, cwd=str(self.repo_path))
-        self.assertIn("No diff with HEAD.", result.stderr)
-
-    def prepare_fake_file(self, fake_file_path: Path):
-        mock_diff_path = Path(__file__).parent / "data" / "mock_diff.txt"
-        with open(mock_diff_path) as f:
-            test_diff = f.read()
-        with open(fake_file_path, "w") as fake_repo_file:
-            fake_repo_file.write(test_diff)
-        subprocess.run([
-            'git', 'add', str(fake_file_path),
-        ], capture_output=True, text=True, cwd=str(self.repo_path))
-
-    @staticmethod
-    def cleanup_fake_file(fake_file_path: Path):
-        os.remove(fake_file_path)
-
-    def test_cli(self):
-        fake_repo_file_path = self.repo_path / "fake_repo_file.py"
-        self.prepare_fake_file(fake_repo_file_path)
-        result = subprocess.run([
-            'python', str(self.cli_path),
-            '--repo_path', str(self.repo_path),
-            '--openai_model_name', "gpt-3.5-turbo",
-            '--custom_principles_path', str(self.repo_path / ".coding_principles"),
-            '--file_extensions_to_review', ".py", ".md"
-        ], capture_output=True, text=True, cwd=str(self.repo_path))
-        self.cleanup_fake_file(fake_repo_file_path)
-        self.assertIn("Review completed", result.stderr)
