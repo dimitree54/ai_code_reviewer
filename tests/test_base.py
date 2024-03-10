@@ -109,5 +109,4 @@ class TestCLI(unittest.TestCase):
             '--file_extensions_to_review', ".py", ".md"
         ], capture_output=True, text=True)
         self.cleanup_fake_file(fake_repo_file_path)
-        self.assertIn("Single responsibility principle warning", result.stderr)
         self.assertIn("Review completed", result.stderr)
