@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Dict
 
-from git import Repo
+from git import Repo, GitCommandError
 
 
 def add_line_numbers(diff: str) -> str:
@@ -29,7 +29,10 @@ def get_files_diff(repository_path: Path, other: str) -> Dict[str, str]:
 
     changed_files = repo.git.diff(other, name_only=True).split('\n')
     for file in changed_files:
-        file_diff = repo.git.diff(other, file, unified=100000000)  # hack to get full file
-        file_diff = strip_diff_header(file_diff)
+        try:
+            file_diff = repo.git.diff(other, file, unified=100000000)  # hack to get full file
+            file_diff = strip_diff_header(file_diff)
+        except GitCommandError:
+            raise ValueError(f"No diff with {other}. Introduce diff or provide different compare_with tag")
         diffs[file] = file_diff
     return diffs
