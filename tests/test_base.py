@@ -55,27 +55,12 @@ class TestProgrammingPrincipleReviewer(unittest.IsolatedAsyncioTestCase):
             )
         )
         self.reviewer = container.reviewers()[0]
+        mock_diff_path = Path(__file__).parent / "data" / "mock_diff.txt"
+        with open(mock_diff_path) as f:
+            self.test_diff = f.read()
 
     async def test_review(self):
-        test_diff = """+ class FileManager:
-+     def __init__(self, filename):
-+         self.path = Path(filename)
-+
-+     def read(self, encoding="utf-8"):
-+         return self.path.read_text(encoding)
-+
-+     def write(self, data, encoding="utf-8"):
-+         self.path.write_text(data, encoding)
-+
-+     def compress(self):
-+         with ZipFile(self.path.with_suffix(".zip"), mode="w") as archive:
-+             archive.write(self.path)
-+
-+     def decompress(self):
-+         with ZipFile(self.path.with_suffix(".zip"), mode="r") as archive:
-+             archive.extractall()
-"""
-        reviews = await self.reviewer.review_file_diff(test_diff)
+        reviews = await self.reviewer.review_file_diff(self.test_diff)
         self.assertGreater(len(reviews.comments), 0)
 
     async def test_empty_review(self):
