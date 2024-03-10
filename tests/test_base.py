@@ -2,7 +2,6 @@ import subprocess
 import subprocess
 import unittest
 from pathlib import Path
-from unittest.mock import patch
 
 from ai_code_reviewer.containers import Container, AppConfig
 from ai_code_reviewer.review import FileDiffReview, \
@@ -76,16 +75,12 @@ class TestCLI(unittest.TestCase):
     def setUp(self):
         self.repo_path = Path(__file__).parents[1]
         self.cli_path = self.repo_path / "ai_code_reviewer" / "cli.py"
-        mock_diff_path = Path(__file__).parent / "data" / "mock_diff.txt"
-        with open(mock_diff_path) as f:
-            self.test_diff = f.read()
 
     def test_cli_default_empty(self):
-        with patch("ai_code_reviewer.utils.get_files_diff", return_value={'file_manager.py': ""}):
-            result = subprocess.run([
-                'python', str(self.cli_path),
-                '--repo_path', str(self.repo_path),
-            ], capture_output=True, text=True)
-            self.assertIn("Review completed", result.stderr)
-            self.assertIn("0.00$", result.stderr)
+        result = subprocess.run([
+            'python', str(self.cli_path),
+            '--repo_path', str(self.repo_path),
+        ], capture_output=True, text=True)
+        self.assertIn("Review completed", result.stderr)
+        self.assertIn("0.00$", result.stderr)
 
