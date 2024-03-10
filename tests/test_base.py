@@ -75,9 +75,6 @@ class TestCLI(unittest.TestCase):
     def setUp(self):
         self.repo_path = Path(__file__).parents[1]
         self.cli_path = self.repo_path / "ai_code_reviewer" / "cli.py"
-        mock_diff_path = Path(__file__).parent / "data" / "mock_diff.txt"
-        with open(mock_diff_path) as f:
-            self.test_diff = f.read()
 
     def test_cli_default_no_diff(self):
         result = subprocess.run([
@@ -86,13 +83,24 @@ class TestCLI(unittest.TestCase):
         ], capture_output=True, text=True)
         self.assertIn("No diff with HEAD.", result.stderr)
 
+    @staticmethod
+    def prepare_fake_file(fake_file_path: Path):
+        mock_diff_path = Path(__file__).parent / "data" / "mock_diff.txt"
+        with open(mock_diff_path) as f:
+            test_diff = f.read()
+        with open(fake_file_path, "w") as fake_repo_file:
+            fake_repo_file.write(test_diff)
+        subprocess.run([
+            'git', 'add', str(fake_file_path),
+        ], capture_output=True, text=True)
+
+    @staticmethod
+    def cleanup_fake_file(fake_file_path: Path):
+        os.remove(fake_file_path)
+
     def test_cli(self):
         fake_repo_file_path = self.repo_path / "fake_repo_file.py"
-        with open(fake_repo_file_path, "w") as fake_repo_file:
-            fake_repo_file.write(self.test_diff)
-        subprocess.run([
-            'git', 'add', str(fake_repo_file_path),
-        ], capture_output=True, text=True)
+        self.prepare_fake_file(fake_repo_file_path)
         result = subprocess.run([
             'python', str(self.cli_path),
             '--repo_path', str(self.repo_path),
@@ -100,5 +108,6 @@ class TestCLI(unittest.TestCase):
             '--custom_principles_path', str(self.repo_path / ".coding_principles"),
             '--file_extensions_to_review', ".py", ".md"
         ], capture_output=True, text=True)
-        self.assertIn("No diff with HEAD.", result.stderr)
-        os.remove(fake_repo_file_path)
+        self.cleanup_fake_file(fake_repo_file_path)
+        self.assertIn("Single responsibility principle warning", result.stderr)
+        self.assertIn("Review completed", result.stderr)
