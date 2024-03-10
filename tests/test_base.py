@@ -91,6 +91,9 @@ class TestCLI(unittest.TestCase):
         with open(fake_repo_file_path, "w") as fake_repo_file:
             fake_repo_file.write(self.test_diff)
         result = subprocess.run([
+            'git', 'add', str(fake_repo_file_path),
+        ], capture_output=True, text=True)
+        result = subprocess.run([
             'python', str(self.cli_path),
             '--repo_path', str(self.repo_path),
             '--openai_model_name', "gpt-3.5-turbo",
