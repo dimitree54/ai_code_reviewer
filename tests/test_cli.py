@@ -8,12 +8,17 @@ class TestCLI(unittest.TestCase):
     def setUp(self):
         self.repo_path = Path(__file__).parents[1]
         self.cli_path = self.repo_path / "ai_code_reviewer" / "cli.py"
+        self.env = {
+            "OPENAI_API_KEY": os.environ["OPENAI_API_KEY"],
+            "PYTHONPATH": str(self.repo_path),
+            "PATH": os.environ["PATH"]
+        }
 
     def test_cli_default_no_diff(self):
         result = subprocess.run([
             'python', str(self.cli_path),
             '--repo_path', str(self.repo_path),
-        ], capture_output=True, text=True, cwd=str(self.repo_path))
+        ], capture_output=True, text=True, cwd=str(self.repo_path), env=self.env)
         self.assertIn("No diff with HEAD.", result.stderr)
 
 
@@ -21,6 +26,12 @@ class TestCLIWithFakeDiff(unittest.TestCase):
     def setUp(self):
         self.repo_path = Path(__file__).parents[1]
         self.cli_path = self.repo_path / "ai_code_reviewer" / "cli.py"
+
+        self.env = {
+            "OPENAI_API_KEY": os.environ["OPENAI_API_KEY"],
+            "PYTHONPATH": str(self.repo_path),
+            "PATH": os.environ["PATH"]
+        }
 
         mock_diff_path = Path(__file__).parent / "data" / "mock_diff.txt"
         with open(mock_diff_path) as f:
@@ -42,5 +53,5 @@ class TestCLIWithFakeDiff(unittest.TestCase):
             '--openai_model_name', "gpt-3.5-turbo",
             '--custom_principles_path', str(self.repo_path / ".coding_principles"),
             '--file_extensions_to_review', ".py", ".md"
-        ], capture_output=True, text=True, cwd=str(self.repo_path))
+        ], capture_output=True, text=True, cwd=str(self.repo_path), env=self.env)
         self.assertIn("Review completed", result.stderr)
