@@ -67,5 +67,3 @@ class TestProgrammingPrincipleReviewer(unittest.IsolatedAsyncioTestCase):
         test_diff = """"""
         reviews = await self.reviewer.review_file_diff(test_diff)
         self.assertEqual(len(reviews.comments), 0)
-
-
