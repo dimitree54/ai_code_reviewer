@@ -80,11 +80,10 @@ class TestCLI(unittest.TestCase):
         result = subprocess.run([
             'python', str(self.cli_path),
             '--repo_path', str(self.repo_path),
-        ], capture_output=True, text=True)
+        ], capture_output=True, text=True, cwd=str(self.repo_path))
         self.assertIn("No diff with HEAD.", result.stderr)
 
-    @staticmethod
-    def prepare_fake_file(fake_file_path: Path):
+    def prepare_fake_file(self, fake_file_path: Path):
         mock_diff_path = Path(__file__).parent / "data" / "mock_diff.txt"
         with open(mock_diff_path) as f:
             test_diff = f.read()
@@ -92,7 +91,7 @@ class TestCLI(unittest.TestCase):
             fake_repo_file.write(test_diff)
         subprocess.run([
             'git', 'add', str(fake_file_path),
-        ], capture_output=True, text=True)
+        ], capture_output=True, text=True, cwd=str(self.repo_path))
 
     @staticmethod
     def cleanup_fake_file(fake_file_path: Path):
@@ -107,6 +106,6 @@ class TestCLI(unittest.TestCase):
             '--openai_model_name', "gpt-3.5-turbo",
             '--custom_principles_path', str(self.repo_path / ".coding_principles"),
             '--file_extensions_to_review', ".py", ".md"
-        ], capture_output=True, text=True)
+        ], capture_output=True, text=True, cwd=str(self.repo_path))
         self.cleanup_fake_file(fake_repo_file_path)
         self.assertIn("Review completed", result.stderr)
