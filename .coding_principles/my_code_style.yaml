@@ -1,0 +1,19 @@
+principle_name: My code style
+
+principle_description: |
+  1. All functions should always have input and output typehints with few exceptions: 
+    - If no output in function, typehint may be omitted. 
+    - self parameter of class methods does not need typehint
+  2. Functions should not re-implement existing logic. If you know that some function already implemented in some library (numpy, pandas, scipy...), prefer these 3rd party implementations rather than yours.
+  3. Avoid comments. 
+    - Try to make it clear what function or class do from its name, param names and types, not by commenting. 
+    - Comments allowed only in complex logic (for example math), only if it is impossible to express your idea by clear code.
+    - Especially avoid commented code. If you think some code block is very useful, but now it should not run, hide under some switchable parameter + if.
+  5. Naming guidelines: avoid meaningless names and shortenings
+
+review_required_examples: |
+  No examples
+  
+
+review_not_required_examples: |
+  No examples
