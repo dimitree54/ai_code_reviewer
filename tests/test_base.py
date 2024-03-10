@@ -1,5 +1,8 @@
+import subprocess
+import subprocess
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from ai_code_reviewer.containers import Container, AppConfig
 from ai_code_reviewer.review import FileDiffReview, \
@@ -55,30 +58,34 @@ class TestProgrammingPrincipleReviewer(unittest.IsolatedAsyncioTestCase):
             )
         )
         self.reviewer = container.reviewers()[0]
+        mock_diff_path = Path(__file__).parent / "data" / "mock_diff.txt"
+        with open(mock_diff_path) as f:
+            self.test_diff = f.read()
 
     async def test_review(self):
-        test_diff = """+ class FileManager:
-+     def __init__(self, filename):
-+         self.path = Path(filename)
-+
-+     def read(self, encoding="utf-8"):
-+         return self.path.read_text(encoding)
-+
-+     def write(self, data, encoding="utf-8"):
-+         self.path.write_text(data, encoding)
-+
-+     def compress(self):
-+         with ZipFile(self.path.with_suffix(".zip"), mode="w") as archive:
-+             archive.write(self.path)
-+
-+     def decompress(self):
-+         with ZipFile(self.path.with_suffix(".zip"), mode="r") as archive:
-+             archive.extractall()
-"""
-        reviews = await self.reviewer.review_file_diff(test_diff)
+        reviews = await self.reviewer.review_file_diff(self.test_diff)
         self.assertGreater(len(reviews.comments), 0)
 
     async def test_empty_review(self):
         test_diff = """"""
         reviews = await self.reviewer.review_file_diff(test_diff)
         self.assertEqual(len(reviews.comments), 0)
+
+
+class TestCLI(unittest.TestCase):
+    def setUp(self):
+        self.repo_path = Path(__file__).parents[1]
+        self.cli_path = self.repo_path / "ai_code_reviewer" / "cli.py"
+        mock_diff_path = Path(__file__).parent / "data" / "mock_diff.txt"
+        with open(mock_diff_path) as f:
+            self.test_diff = f.read()
+
+    def test_cli_default_empty(self):
+        with patch("ai_code_reviewer.utils.get_files_diff", return_value={'file_manager.py': ""}):
+            result = subprocess.run([
+                'python', str(self.cli_path),
+                '--repo_path', str(self.repo_path),
+            ], capture_output=True, text=True)
+            self.assertIn("Review completed", result.stderr)
+            self.assertIn("0.00$", result.stderr)
+
