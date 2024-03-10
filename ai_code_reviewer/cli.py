@@ -85,27 +85,33 @@ def main():
 
     repo_path = Path(args.repo_path)
     allowed_extensions = set(args.file_extensions_to_review)
-    coding_principles_path = Path(args.custom_principles_path) or repo_path / ".coding_principles"
+    coding_principles_path = Path(args.custom_principles_path) if args.custom_principles_path \
+        else repo_path / ".coding_principles"
 
     all_principles_path = [
-        Path(principle_path) for principle_path in os.listdir(coding_principles_path)
-        if os.path.splitext(coding_principles_path)[1] == ".yaml"
+        coding_principles_path / principle_path for principle_path in os.listdir(coding_principles_path)
+        if os.path.splitext(principle_path)[1] == ".yaml"
     ]
     if len(all_principles_path) == 0:
         logger.error(
             f"No review principles found. You need to populate '{coding_principles_path}' dir with review principles."
             f" {more_info_link}")
         return
-    app_config = AppConfig(
-        llm_model_name=args.openai_model_name,
-        principles_path=all_principles_path
-    )
-    container = Container(config=app_config)
+    container = Container.from_config(
+            AppConfig(
+                principles_path=all_principles_path,
+                llm_model_name=args.openai_model_name
+            )
+        )
 
     with get_openai_callback() as cb:  # noqa
         start_time = time.time()
         asyncio.run(review_repo_diff(
-            container.reviewers, repo_path, allowed_extensions, args.compare_with, logger
+            container.reviewers(), repo_path, allowed_extensions, args.compare_with, logger
         ))
         time_spent = time.time() - start_time
         logger.info(f"Review completed in {round(time_spent, 2)}s and {round(cb.total_cost, 2)}$")
+
+
+if __name__ == '__main__':
+    main()
