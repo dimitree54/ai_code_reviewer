@@ -1,7 +1,4 @@
-from typing import List
-
-from langchain_core.messages import BaseMessage
-from langchain_core.runnables import RunnableSerializable
+from langchain_core.runnables import Runnable
 from pydantic import BaseModel as BaseModelV2, Field
 from yid_langchain_extensions.utils import pydantic_v1_port
 
@@ -19,7 +16,7 @@ class ProgrammingPrinciple(BaseModelV2):
 
 class ProgrammingPrincipleReviewer(Reviewer):
     programming_principle: ProgrammingPrinciple
-    diff_review_chain: pydantic_v1_port(RunnableSerializable[List[BaseMessage], FileDiffReview])
+    diff_review_chain: pydantic_v1_port(Runnable)
 
     async def review_file_diff(self, diff: str) -> FileDiffReview:
         if len(diff) == 0:
