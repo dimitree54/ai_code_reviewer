@@ -1,15 +1,18 @@
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Type
 
 import yaml
 from dependency_injector.containers import DeclarativeContainer
 from dependency_injector.providers import Factory, Singleton, Callable, Configuration
 from langchain import hub
-from langchain_core.output_parsers import PydanticOutputParser
+from langchain.agents.output_parsers.openai_tools import OpenAIToolsAgentOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnableSerializable
 from langchain_openai import ChatOpenAI
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+from yid_langchain_extensions.llm.tools_llm_with_thought import build_tools_llm_with_thought
+from yid_langchain_extensions.output_parser.pydantic_from_tool import PydanticOutputParser
+from yid_langchain_extensions.utils import convert_to_openai_tool_v2
 
 from ai_code_reviewer.review import FileDiffReview
 from ai_code_reviewer.reviewers.base import Reviewer
@@ -35,6 +38,27 @@ class AppConfig(BaseModel):
     llm_model_temperature: float = 0.0
 
 
+class ReasoningThought(BaseModel):
+    reasoning: str = Field(description="Think step by step, what problems you see and what of them you should report")
+
+
+def build_diff_review_chain(
+        tools_llm: ChatOpenAI,
+        review_class: Type[BaseModel],
+        reasoning_class: Type[BaseModel],
+        prompt: ChatPromptTemplate,
+        reasoning_prompt: ChatPromptTemplate
+) -> BaseModel:
+    review_tool = convert_to_openai_tool_v2(review_class)
+    llm_with_review_tool_and_reasoning = build_tools_llm_with_thought(
+        tools_llm, [review_tool], reasoning_prompt, reasoning_class)
+    pydantic_output_parser = PydanticOutputParser(
+        pydantic_class=review_class,
+        base_parser=OpenAIToolsAgentOutputParser()
+    )
+    return prompt | llm_with_review_tool_and_reasoning | pydantic_output_parser
+
+
 class Container(DeclarativeContainer):
     @staticmethod
     def from_config(app_config: AppConfig) -> "Container":
@@ -46,16 +70,19 @@ class Container(DeclarativeContainer):
 
     llm: Factory[ChatOpenAI] = Factory(
         ChatOpenAI, model_name=config.llm_model_name, temperature=config.llm_model_temperature)
-    llm_review_parser: Factory[PydanticOutputParser] = Factory(PydanticOutputParser, pydantic_object=FileDiffReview)
-    principle_checking_template_partial: Singleton[ChatPromptTemplate] = Singleton(
-        lambda output_parser: hub.pull("dimitree54/code_review_single_responsibility").partial(
-            format_instructions=output_parser.get_format_instructions()
-        ),
-        llm_review_parser
+    principle_checking_template: Singleton[ChatPromptTemplate] = Singleton(
+        lambda: hub.pull("dimitree54/code_review_single_responsibility"),
     )
-    diff_review_chain: Callable[RunnableSerializable[Dict, FileDiffReview]] = Callable(
-        lambda template, llm, parser: template | llm | parser,
-        principle_checking_template_partial, llm, llm_review_parser
+    reasoning_template: Singleton[ChatPromptTemplate] = Singleton(
+        lambda: hub.pull("dimitree54/introduce_thought_tool"),
+    )
+    diff_review_chain: Callable[RunnableSerializable[Dict, FileDiffReview]] = Factory(
+        build_diff_review_chain,
+        tools_llm=llm,
+        review_class=FileDiffReview,
+        reasoning_class=ReasoningThought,
+        prompt=principle_checking_template,
+        reasoning_prompt=reasoning_template
     )
     reviewers: Singleton[List[Reviewer]] = Singleton(
         lambda principles_path, diff_review_chain: [
