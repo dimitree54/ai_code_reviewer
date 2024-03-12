@@ -1,14 +1,14 @@
 from typing import List
 
-from pydantic.v1 import BaseModel as BaseModelV1
+from pydantic import BaseModel
 
 
-class FileDiffComment(BaseModelV1):
+class FileDiffComment(BaseModel):
     line_number: int
     comment: str
 
 
-class FileDiffReview(BaseModelV1):
+class FileDiffReview(BaseModel):
     comments: List[FileDiffComment]
 
     @property
