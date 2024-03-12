@@ -1,9 +1,5 @@
-from typing import List
-
-from langchain_core.messages import BaseMessage
-from langchain_core.runnables import RunnableSerializable
+from langchain_core.runnables import Runnable
 from pydantic import BaseModel as BaseModelV2, Field
-from yid_langchain_extensions.utils import pydantic_v1_port
 
 from ai_code_reviewer.review import FileDiffReview
 from ai_code_reviewer.reviewers.base import Reviewer
@@ -19,7 +15,10 @@ class ProgrammingPrinciple(BaseModelV2):
 
 class ProgrammingPrincipleReviewer(Reviewer):
     programming_principle: ProgrammingPrinciple
-    diff_review_chain: pydantic_v1_port(RunnableSerializable[List[BaseMessage], FileDiffReview])
+    diff_review_chain: Runnable
+
+    class Config:
+        arbitrary_types_allowed = True
 
     async def review_file_diff(self, diff: str) -> FileDiffReview:
         if len(diff) == 0:
@@ -34,4 +33,5 @@ class ProgrammingPrincipleReviewer(Reviewer):
                 "review_not_required_examples": self.programming_principle.review_not_required_examples
             }
         )
+        review.comments = [comment for comment in review.comments if comment.is_violating_principle]
         return review

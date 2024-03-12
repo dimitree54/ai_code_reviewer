@@ -27,7 +27,13 @@ class TestReviewer(Reviewer):
             comments=[
                 FileDiffComment(
                     line_number=3,
-                    comment="test_review"
+                    comment="test_review",
+                    suggestion="test suggestion",
+                    implementation="test implementation",
+                    citation_from_principle="test citation",
+                    how_citation_violated="test violation",
+                    on_the_other_hand="test opposition",
+                    is_violating_principle=True
                 )
             ]
         )

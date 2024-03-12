@@ -1,0 +1,59 @@
+principle_name: My code style
+
+principle_description: |
+  1. Functions should not re-implement existing logic. If you know that some function already implemented in some library (numpy, pandas, scipy...), prefer these 3rd party implementations rather than yours.
+  2. Avoid comments. 
+    - Try to make it clear what function or class do from its name, param names and types, not by commenting. 
+    - Comments allowed only in complex logic (for example math), only if it is impossible to express your idea by clear code.
+    - Especially avoid commented code. If you think some code block is very useful, but now it should not run, hide under some switchable parameter + if.
+  3. Naming guidelines
+    - avoid meaningless names
+    - avoid shortenings
+    - do not use names that already occupied, for example, input is a python reserved name
+  4. All functions should always have input and output explicit typing with few exceptions: 
+    - If no output in function, typehint may be omitted. 
+    - self parameter of class methods does not need typehint
+    - variables are not obligatory typed
+  
+  And be careful to avoid logical errors in the code.
+
+review_required_examples: |
+  ```
+  # sum function
+  def sum(a, b):
+      return a * b
+  ```
+  This function violates several principles at once:
+  1. It re-implement logic of sum already implemented, for example in numpy
+  2. has useless comment not introducing any new information
+  3. has meaningless parameter names
+  4. missing both input and output typehints
+  5. has logic error. It do multiplication even though the name is sum
+  
+
+review_not_required_examples: |
+  `from pydantic import BaseModel as BaseModelV2`: though V2 is not very clear name, because langchain currently uses pydantic v1, so programs using it have to distinguish pydantic v1 and pydantic v2
+  
+  `a = 5  # noqa`: ignore all errors for lines and functions marked with noqa comments
+  
+  For example if we have code
+  ```
+  24: async def review_file_diff(
+  25:    self, 
+  26:    diff: str
+  27: ) -> FileDiffReview:
+  ```
+  and you have reviewed it as follows:
+  `The function 'review_file_diff' lacks explicit input typing for its parameter 'diff'.`,
+  this is the bad review, because diff already have explicit input typing and you erroneously reporting that it has not (but it has typing `str`, self does not need typing). BE VERY CAREFUL ABOUT THIS TYPE OF MISTAKE! ALWAYS DOUBLE CHECK LACK OF TYPING BEFORE REPORTING IT!!!
+  
+  For example if you review code
+  ```
+  33: class Reviewer(BaseModelV2, ABC):
+  34:   async def review_file_diff(self, diff: str) -> FileDiffReview:
+  35:       pass
+  ```
+  and you have reviewed it as follows:
+  `The class 'Reviewer' might be violating the naming guidelines by not being descriptive enough about its purpose.`
+  this is bad review, because this abstract class with single abstract method `review`. You should not report such a subjective violation, only if some principle is objectively violated.
+  
