@@ -39,7 +39,7 @@ class AppConfig(BaseModel):
 
 
 class ReasoningThought(BaseModel):
-    reasoning: str = Field(description="Think step by step, what problems you see and what of them you should report")
+    reasoning: str = Field(description="Think step by step, what potential problems do you see and in what lines.")
 
 
 def build_diff_review_chain(

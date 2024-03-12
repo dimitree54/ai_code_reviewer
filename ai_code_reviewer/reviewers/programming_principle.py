@@ -33,4 +33,5 @@ class ProgrammingPrincipleReviewer(Reviewer):
                 "review_not_required_examples": self.programming_principle.review_not_required_examples
             }
         )
+        review.comments = [comment for comment in review.comments if comment.is_violating_principle]
         return review
