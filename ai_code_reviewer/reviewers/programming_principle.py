@@ -1,6 +1,5 @@
 from langchain_core.runnables import Runnable
 from pydantic import BaseModel as BaseModelV2, Field
-from yid_langchain_extensions.utils import pydantic_v1_port
 
 from ai_code_reviewer.review import FileDiffReview
 from ai_code_reviewer.reviewers.base import Reviewer
@@ -16,7 +15,10 @@ class ProgrammingPrinciple(BaseModelV2):
 
 class ProgrammingPrincipleReviewer(Reviewer):
     programming_principle: ProgrammingPrinciple
-    diff_review_chain: pydantic_v1_port(Runnable)
+    diff_review_chain: Runnable
+
+    class Config:
+        arbitrary_types_allowed = True
 
     async def review_file_diff(self, diff: str) -> FileDiffReview:
         if len(diff) == 0:
