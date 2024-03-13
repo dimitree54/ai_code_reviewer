@@ -35,7 +35,7 @@ async def run_principle_reviewer(
 
 
 def format_review_comment(file_name: str, reviewer_name: str, review: FileDiffComment) -> str:
-    return f"""./{file_name}:{review.line_number + 1}: {reviewer_name} warning: 
+    return f"""./{file_name}:{review.line_number + 1}: {reviewer_name} warning:
 what is violated: {review.citation_from_principle}
 how it is violated: {review.how_citation_violated}
 comment: {review.comment}
