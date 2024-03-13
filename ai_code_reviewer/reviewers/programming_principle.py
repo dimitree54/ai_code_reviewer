@@ -17,6 +17,10 @@ class ProgrammingPrincipleReviewer(Reviewer):
     programming_principle: ProgrammingPrinciple
     diff_review_chain: Runnable
 
+    @property
+    def name(self) -> str:
+        return self.programming_principle.name
+
     class Config:
         arbitrary_types_allowed = True
 

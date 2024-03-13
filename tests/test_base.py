@@ -22,6 +22,9 @@ class TestAddLineNumbers(unittest.TestCase):
 
 
 class TestReviewer(Reviewer):
+    def name(self) -> str:
+        return "test_reviewer_name"
+
     async def review_file_diff(self, diff: str) -> FileDiffReview:
         return FileDiffReview(
             comments=[
