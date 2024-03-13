@@ -10,7 +10,7 @@ import colorlog
 from langchain_community.callbacks import get_openai_callback
 
 from ai_code_reviewer.containers import Container, AppConfig
-from ai_code_reviewer.review import FileDiffReview
+from ai_code_reviewer.review import FileDiffReview, FileDiffComment
 from ai_code_reviewer.reviewers.base import Reviewer
 from ai_code_reviewer.utils import get_files_diff
 
@@ -34,6 +34,20 @@ async def run_principle_reviewer(
         return programming_principle_reviewer, file_name, FileDiffReview(comments=[])
 
 
+def format_review_comment(file_name: str, reviewer_name: str, review: FileDiffComment) -> str:
+    return f"""./{file_name}:{review.line_number + 1}: {reviewer_name} warning: 
+what is violated: {review.citation_from_principle}
+how it is violated: {review.how_citation_violated}
+comment: {review.comment}
+suggested fix: {review.suggestion}
+suggestion implementation:
+```
+{review.implementation}
+```
+
+"""
+
+
 async def review_repo_diff(
         reviewers: List[Reviewer],
         repo_path: Path,
@@ -55,11 +69,7 @@ async def review_repo_diff(
     per_file_reviews = await asyncio.gather(*coroutines)
     for reviewer, file_name, review in per_file_reviews:
         for comment in review.comments:
-            logger.warning(
-                f"./{file_name}:{comment.line_number + 1}: "
-                f"{reviewer.programming_principle.name} warning: "
-                f"{comment.comment}"
-            )
+            logger.warning(format_review_comment(file_name, reviewer.name, comment))
 
 
 def main():
