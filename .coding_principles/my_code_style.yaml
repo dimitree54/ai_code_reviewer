@@ -14,8 +14,29 @@ principle_description: |
     - If no output in function, typehint may be omitted. 
     - self parameter of class methods does not need typehint
     - variables are not obligatory typed
-  
-  And be careful to avoid logical errors in the code.
+  5. Soft single-responsibility:
+    - If method obviously too long or have complex logic, it should be split on simple functions.
+    - This is soft rule, so only hard violations should be reported
+  6. There should be no debug code in production code.
+    - All simple debug (that can be easily reproduced next time) code should be removed
+    - Complex debug code that you want to keep should be passed to code as argument, not be embedded. For example, some special debug loggers may be passed.
+  7. Avoid matching by string, if some string is used as a key and used in several places and you need to every time type it, consider moving it to constant or Enum (if there are several keys)
+  8. Avoid hardcode and magic numbers
+    - This is soft rule, only hard violations should be reported
+    - For example there should be no local pathes or other hardcoded parameters left that you used for debugging. These parameters should be introduced to code using argparse.
+    - The only exceptions where hard-coding allowed are tests. In tests you could use any magic numbers as you want (for testing purposes).
+  9. Pydantic classes recommended:
+    - Preferred way of organising classes is to be a BaseModel class with all fields required for logic accepted from outside rather than using complex initialisation logic
+    - Initialisation and building logic should be moved to a special place, for example to dependency_injector.containers
+    - This is soft rule, only hard violations should be reported
+  10. Avoid confusing naming. For example class *Builder should actually build something
+  11. Each unittest should assert something. Avoid tests that just checks for absense of exceptions.
+  12. Avoid prints
+    - No debug prints should be left in code after debug
+    - If you need printing in production code, prefer specialised logging classes.
+  13. Prefer Path lib over str + os.path
+  14. Avoid very complex code lines where a lot of logic done in single line. In that case better to move intermediate computations to a separate variable.
+  15. The code with obvious logical errors should be reported
 
 review_required_examples: |
   ```
@@ -56,4 +77,11 @@ review_not_required_examples: |
   and you have reviewed it as follows:
   `The class 'Reviewer' might be violating the naming guidelines by not being descriptive enough about its purpose.`
   this is bad review, because this abstract class with single abstract method `review`. You should not report such a subjective violation, only if some principle is objectively violated.
+  
+  For example if you report following:
+  ```
+  what is violated: The code with obvious logical errors should be reported
+  how it is violated: Using a broad 'except Exception' clause can lead to logical errors by suppressing unexpected exceptions.
+  ```
+  This is bad review, because you are reporting problem not explicitly mentioned in your instructions. You supposed to report existing logical errors in code, not the code that "can lead to logical errors"
   
