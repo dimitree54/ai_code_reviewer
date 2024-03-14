@@ -34,7 +34,7 @@ def load_principle_reviewer(
 
 class AppConfig(BaseModel):
     principles_path: List[Path]
-    llm_model_name: str = "gpt-4-0125-preview"
+    llm_model_name: str
     llm_model_temperature: float = 0.0
 
 
