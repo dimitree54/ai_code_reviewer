@@ -55,8 +55,6 @@ review_required_examples: |
 review_not_required_examples: |
   `from pydantic import BaseModel as BaseModelV2`: though V2 is not very clear name, because langchain currently uses pydantic v1, so programs using it have to distinguish pydantic v1 and pydantic v2
   
-  `a = 5  # noqa`: ignore all errors for lines and functions marked with noqa comments
-  
   For example if we have code
   ```
   24: async def review_file_diff(
