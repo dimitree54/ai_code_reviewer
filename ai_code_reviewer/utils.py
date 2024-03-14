@@ -30,7 +30,7 @@ def get_files_diff(repository_path: Path, other: str) -> Dict[str, str]:
     changed_files = repo.git.diff(other, name_only=True).split('\n')
     for file in changed_files:
         try:
-            file_diff = repo.git.diff(other, file, unified=100000000)  # hack to get full file
+            file_diff = repo.git.diff(other, file, unified=100000000)  # noqa hack to get full file
             file_diff = strip_diff_header(file_diff)
         except GitCommandError:
             raise ValueError(f"No diff with {other}. Introduce diff or provide different compare_with tag")
