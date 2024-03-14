@@ -7,7 +7,7 @@ from dependency_injector.providers import Factory, Singleton, Callable, Configur
 from langchain import hub
 from langchain.agents.output_parsers.openai_tools import OpenAIToolsAgentOutputParser
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.runnables import RunnableSerializable
+from langchain_core.runnables import RunnableSerializable, Runnable
 from langchain_openai import ChatOpenAI
 from pydantic import BaseModel, Field
 from yid_langchain_extensions.llm.tools_llm_with_thought import build_tools_llm_with_thought
@@ -48,7 +48,7 @@ def build_diff_review_chain(
         reasoning_class: Type[BaseModel],
         prompt: ChatPromptTemplate,
         reasoning_prompt: ChatPromptTemplate
-) -> BaseModel:
+) -> Runnable:
     review_tool = convert_to_openai_tool_v2(review_class)
     llm_with_review_tool_and_reasoning = build_tools_llm_with_thought(
         tools_llm, [review_tool], reasoning_prompt, reasoning_class)
