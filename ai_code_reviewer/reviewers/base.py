@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 from pydantic import BaseModel as BaseModelV2
 
-from ai_code_reviewer.review import FileDiffReview
+from ai_code_reviewer.review import FileDiffComments
 
 
 class Reviewer(BaseModelV2, ABC):
@@ -11,5 +11,5 @@ class Reviewer(BaseModelV2, ABC):
     def name(self) -> str:
         pass
 
-    async def review_file_diff(self, diff: str) -> FileDiffReview:
+    async def review_file_diff(self, diff: str) -> FileDiffComments:
         pass

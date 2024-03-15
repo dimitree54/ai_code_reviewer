@@ -14,13 +14,13 @@ from yid_langchain_extensions.llm.tools_llm_with_thought import build_tools_llm_
 from yid_langchain_extensions.output_parser.pydantic_from_tool import PydanticOutputParser
 from yid_langchain_extensions.utils import convert_to_openai_tool_v2
 
-from ai_code_reviewer.review import FileDiffReview
+from ai_code_reviewer.review import FileDiffComments
 from ai_code_reviewer.reviewers.base import Reviewer
 from ai_code_reviewer.reviewers.programming_principle import ProgrammingPrincipleReviewer, ProgrammingPrinciple
 
 
 def load_principle_reviewer(
-        principle_yaml_path: Path, diff_review_chain: RunnableSerializable[Dict, FileDiffReview]
+        principle_yaml_path: Path, diff_review_chain: RunnableSerializable[Dict, FileDiffComments]
 ) -> ProgrammingPrincipleReviewer:
     with open(principle_yaml_path, "r") as file:
         programming_principle_dict = yaml.safe_load(file)
@@ -76,10 +76,10 @@ class Container(DeclarativeContainer):
     reasoning_template: Singleton[ChatPromptTemplate] = Singleton(
         lambda: hub.pull("dimitree54/introduce_thought_tool"),
     )
-    diff_review_chain: Callable[RunnableSerializable[Dict, FileDiffReview]] = Factory(
+    diff_review_chain: Callable[RunnableSerializable[Dict, FileDiffComments]] = Factory(
         build_diff_review_chain,
         tools_llm=llm,
-        review_class=FileDiffReview,
+        review_class=FileDiffComments,
         reasoning_class=ReasoningThought,
         prompt=principle_checking_template,
         reasoning_prompt=reasoning_template

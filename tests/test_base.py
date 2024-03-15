@@ -2,7 +2,7 @@ import unittest
 from pathlib import Path
 
 from ai_code_reviewer.containers import Container, AppConfig
-from ai_code_reviewer.review import FileDiffReview, \
+from ai_code_reviewer.review import FileDiffComments, \
     FileDiffComment
 from ai_code_reviewer.reviewers.base import Reviewer
 from ai_code_reviewer.utils import add_line_numbers
@@ -25,8 +25,8 @@ class TestReviewer(Reviewer):
     def name(self) -> str:
         return "test_reviewer_name"
 
-    async def review_file_diff(self, diff: str) -> FileDiffReview:
-        return FileDiffReview(
+    async def review_file_diff(self, diff: str) -> FileDiffComments:
+        return FileDiffComments(
             comments=[
                 FileDiffComment(
                     line_number=3,
