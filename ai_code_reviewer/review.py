@@ -20,7 +20,3 @@ class FileDiffComment(BaseModel):
 
 class FileDiffReview(BaseModel):
     comments: List[FileDiffComment]
-
-    @property
-    def approve(self) -> bool:
-        return len(self.comments) == 0
