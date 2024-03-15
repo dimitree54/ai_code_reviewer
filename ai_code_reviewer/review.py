@@ -18,9 +18,5 @@ class FileDiffComment(BaseModel):
                     " but just a general code improvement suggestion.")
 
 
-class FileDiffReview(BaseModel):
+class FileDiffComments(BaseModel):
     comments: List[FileDiffComment]
-
-    @property
-    def approve(self) -> bool:
-        return len(self.comments) == 0

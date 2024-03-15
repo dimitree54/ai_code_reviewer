@@ -1,7 +1,7 @@
 from langchain_core.runnables import Runnable
 from pydantic import BaseModel as BaseModelV2, Field
 
-from ai_code_reviewer.review import FileDiffReview
+from ai_code_reviewer.review import FileDiffComments
 from ai_code_reviewer.reviewers.base import Reviewer
 from ai_code_reviewer.utils import add_line_numbers
 
@@ -24,11 +24,11 @@ class ProgrammingPrincipleReviewer(Reviewer):
     class Config:
         arbitrary_types_allowed = True
 
-    async def review_file_diff(self, diff: str) -> FileDiffReview:
+    async def review_file_diff(self, diff: str) -> FileDiffComments:
         if len(diff) == 0:
-            return FileDiffReview(comments=[])
+            return FileDiffComments(comments=[])
         enumerated_diff = add_line_numbers(diff)
-        review: FileDiffReview = await self.diff_review_chain.ainvoke(
+        review: FileDiffComments = await self.diff_review_chain.ainvoke(
             input={
                 "enumerated_diff": enumerated_diff,
                 "principle_name": self.programming_principle.name,
@@ -37,5 +37,4 @@ class ProgrammingPrincipleReviewer(Reviewer):
                 "review_not_required_examples": self.programming_principle.review_not_required_examples
             }
         )
-        review.comments = [comment for comment in review.comments if comment.is_violating_principle]
         return review
