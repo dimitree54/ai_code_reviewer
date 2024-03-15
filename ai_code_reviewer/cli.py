@@ -4,7 +4,7 @@ import logging
 import os
 import time
 from pathlib import Path
-from typing import Tuple, Set, List
+from typing import Tuple, Set, List, Dict
 
 import colorlog
 from langchain_community.callbacks import get_openai_callback
@@ -48,25 +48,48 @@ suggestion implementation:
 """
 
 
-async def review_repo_diff(
-        reviewers: List[Reviewer],
+def get_repo_diff(
         repo_path: Path,
-        allowed_extensions: Set[str],
         compare_with: str,
-        logger: logging.Logger
-):
+        allowed_extensions: Set[str],
+) -> Dict[str, str]:
     per_file_diff = get_files_diff(repo_path, compare_with)
     per_file_diff = {
         file_name: file_diff for file_name, file_diff in per_file_diff.items()
         if os.path.splitext(file_name)[1] in allowed_extensions
     }
+    return per_file_diff
 
+
+def get_all_files(
+        repo_path: Path,
+        allowed_extensions: Set[str],
+) -> Dict[str, str]:
+    files_content = {}
+    for item in repo_path.rglob('*'):
+        if item.is_file() and item.suffix in allowed_extensions:
+            with open(item, 'r', encoding='utf-8') as file:
+                files_content[str(item.absolute())] = file.read()
+    return files_content
+
+
+async def get_reviews(
+        per_file_diff: Dict[str, str],
+        reviewers: List[Reviewer]
+) -> Tuple[Reviewer, str, FileDiffReview]:
     coroutines = []
     for reviewer in reviewers:
         for file_name, file_diff in per_file_diff.items():
             coroutines.append(run_principle_reviewer(reviewer, file_name, file_diff))
 
     per_file_reviews = await asyncio.gather(*coroutines)
+    return per_file_reviews  # noqa
+
+
+def report_reviews(
+        per_file_reviews: Tuple[Reviewer, str, FileDiffReview],
+        logger: logging.Logger
+):
     for reviewer, file_name, review in per_file_reviews:
         for comment in review.comments:
             logger.warning(format_review_comment(file_name, reviewer.name, comment))
@@ -86,6 +109,12 @@ def main():
                         help="Name of openai gpt model that will review you code.")
     parser.add_argument('--file_extensions_to_review', type=str, nargs='+', default=['.py'],
                         help='List of file extensions to review')
+    parser.add_argument('--suppress_not_changed_lines', action='store_true',
+                        help='Forbid reviewing not changed lines')
+    parser.add_argument('--suppress_noqa_lines', action='store_true',
+                        help='Forbid reviewing lines with noqa comment')
+    parser.add_argument('--include_not_changed_files', action='store_true',
+                        help='Review all files, not only changed ones.')
     args = parser.parse_args()
 
     more_info_link = "More information: https://github.com/dimitree54/ai_code_reviewer/blob/main/README.md"
@@ -114,11 +143,15 @@ def main():
             )
         )
 
+    files_to_review = get_all_files(repo_path, allowed_extensions) if args.include_not_changed_files \
+        else get_repo_diff(repo_path, args.compare_with, allowed_extensions)
+
     with get_openai_callback() as cb:  # noqa
         start_time = time.time()
-        asyncio.run(review_repo_diff(
-            container.reviewers(), repo_path, allowed_extensions, args.compare_with, logger
-        ))
+        all_reviews = asyncio.run(
+            get_reviews(files_to_review, container.reviewers())
+        )
+        report_reviews(all_reviews, logger)
         time_spent = time.time() - start_time
         logger.info(f"Review completed in {round(time_spent, 2)}s and {round(cb.total_cost, 2)}$")
 
