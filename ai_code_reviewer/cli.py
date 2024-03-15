@@ -47,7 +47,7 @@ def report_reviews(
 ):
     for review in reviews:
         for comment in review.comments:
-            logger.warning(format_report(review.file_name, review.reviewer.name, comment))
+            logger.warning(format_report(review.file_name, review.author.name, comment))
 
 
 def main():
