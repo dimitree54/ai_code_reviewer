@@ -45,9 +45,9 @@ def report_reviews(
         reviews: List[FileDiffReview],
         logger: logging.Logger
 ):
-    for reviewer, file_name, review in reviews:
+    for review in reviews:
         for comment in review.comments:
-            logger.warning(format_report(file_name, reviewer.name, comment))
+            logger.warning(format_report(review.file_name, review.reviewer.name, comment))
 
 
 def main():
