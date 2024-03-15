@@ -2,8 +2,6 @@ from typing import List
 
 from pydantic import BaseModel, Field
 
-from ai_code_reviewer.reviewers.base import Reviewer
-
 
 class FileDiffComment(BaseModel):
     line_number: int
@@ -22,8 +20,3 @@ class FileDiffComment(BaseModel):
 
 class FileDiffComments(BaseModel):
     comments: List[FileDiffComment]
-
-
-class FileDiffReview(FileDiffComments):
-    author: Reviewer
-    file_name: str

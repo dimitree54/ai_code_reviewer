@@ -1,12 +1,10 @@
-import asyncio
 import os
 from pathlib import Path
-from typing import Dict, Set, List
+from typing import Dict, Set
 
 from git import Repo, GitCommandError
 
-from ai_code_reviewer.review import FileDiffReview
-from ai_code_reviewer.reviewers.base import Reviewer
+from ai_code_reviewer.run_review import FileDiffReview
 
 
 def add_line_numbers(diff: str) -> str:
@@ -43,25 +41,6 @@ def get_files_diff(repository_path: Path, other: str) -> Dict[str, str]:
     return diffs
 
 
-async def run_principle_reviewer(
-        programming_principle_reviewer: Reviewer, file_name: str, file_diff: str
-) -> FileDiffReview:
-    try:
-        file_diff_comments = await programming_principle_reviewer.review_file_diff(file_diff)
-        review = FileDiffReview(
-            comments=file_diff_comments.comments,
-            author=programming_principle_reviewer,
-            file_name=file_name
-        )
-        return review
-    except Exception:  # noqa
-        return FileDiffReview(
-            comments=[],
-            author=programming_principle_reviewer,
-            file_name=file_name
-        )
-
-
 def get_repo_diff(
         repo_path: Path,
         compare_with: str,
@@ -85,18 +64,6 @@ def get_all_files(
             with open(item, 'r', encoding='utf-8') as file:
                 files_content[str(item.absolute())] = file.read()
     return files_content
-
-
-async def get_reviews(
-        per_file_diff: Dict[str, str],
-        reviewers: List[Reviewer]
-) -> List[FileDiffReview]:
-    coroutines = []
-    for reviewer in reviewers:
-        for file_name, file_diff in per_file_diff.items():
-            coroutines.append(run_principle_reviewer(reviewer, file_name, file_diff))
-    per_file_reviews: List[FileDiffReview] = list(await asyncio.gather(*coroutines))
-    return per_file_reviews
 
 
 def suppress_irrelevant_comments(

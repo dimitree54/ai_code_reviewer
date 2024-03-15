@@ -10,9 +10,12 @@ import colorlog
 from langchain_community.callbacks import get_openai_callback
 
 from ai_code_reviewer.containers import Container, AppConfig
-from ai_code_reviewer.review import FileDiffComment, FileDiffReview
-from ai_code_reviewer.utils import get_repo_diff, get_all_files, get_reviews, \
+from ai_code_reviewer.review import FileDiffComment
+from ai_code_reviewer.run_review import FileDiffReview, get_reviews
+from ai_code_reviewer.utils import (
+    get_repo_diff, get_all_files,
     suppress_irrelevant_comments, suppress_not_changed_lines_comments, suppress_noqa_line_comments
+)
 
 
 def get_logger() -> logging.Logger:
