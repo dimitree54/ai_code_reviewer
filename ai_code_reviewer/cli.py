@@ -4,7 +4,7 @@ import logging
 import os
 import time
 from pathlib import Path
-from typing import List
+from typing import List, Collection
 
 import colorlog
 from langchain_community.callbacks import get_openai_callback
@@ -48,6 +48,15 @@ def report_reviews(
     for review in reviews:
         for comment in review.comments:
             logger.warning(format_report(review.file_name, review.author.name, comment))
+
+
+def report_files_to_review(
+        file_paths: Collection[str],
+        logger: logging.Logger
+):
+    logger.info(f"{len(file_paths)} files will be reviewed:")
+    for file_path in file_paths:
+        logger.info(file_path)
 
 
 def main():
@@ -102,6 +111,7 @@ def main():
 
     files_to_review = get_all_files(repo_path, allowed_extensions) if args.include_not_changed_files \
         else get_repo_diff(repo_path, args.compare_with, allowed_extensions)
+    report_files_to_review(files_to_review.keys(), logger)
 
     with get_openai_callback() as cb:  # noqa
         start_time = time.time()
