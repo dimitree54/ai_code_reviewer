@@ -6,7 +6,7 @@ principle_description: |
   
   This principle is closely related to the concept of separation of concerns, which suggests that you should split your programs into different sections. Each section must address a separate concern.
   
-  The concept of responsibility in this context may be pretty subjective. Having a single responsibility doesn’t necessarily mean having a single method. Responsibility isn’t directly tied to the number of methods but to the core task that your class is responsible for, depending on your idea of what the class represents in your code. However, that subjectivity shouldn’t stop you from striving to use the SRP.
+  The concept of responsibility in this context may be pretty subjective. Having a single responsibility does not necessarily mean having a single method. Responsibility isn’t directly tied to the number of methods but to the core task that your class is responsible for, depending on your idea of what the class represents in your code. However, that subjectivity should not stop you from striving to use the SRP.
 
 review_required_examples: |
   To illustrate the single-responsibility principle and how it can help you improve your object-oriented design, say that you have the following FileManager class:
