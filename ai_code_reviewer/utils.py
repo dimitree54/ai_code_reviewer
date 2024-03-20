@@ -32,7 +32,7 @@ def get_files_diff(repository_path: Path, other: str) -> Dict[str, str]:
 
     changed_files = repo.git.diff(other, name_only=True).split('\n')
     for file in changed_files:
-        if not os.path.isfile(file):
+        if not Path(file).is_file():
             continue
         try:
             file_diff = repo.git.diff(other, file, unified=100000000)  # noqa hack to get full file

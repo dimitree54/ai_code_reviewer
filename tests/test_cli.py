@@ -19,7 +19,7 @@ class TestCLI(unittest.TestCase):
             'python', str(self.cli_path),
             '--repo_path', str(self.repo_path),
         ], capture_output=True, text=True, cwd=str(self.repo_path), env=self.env)
-        self.assertIn("No diff with HEAD.", result.stderr)
+        self.assertIn("0 files will be reviewed", result.stderr)
 
 
 class TestCLIWithFakeDiff(unittest.TestCase):
