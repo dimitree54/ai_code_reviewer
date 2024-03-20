@@ -23,7 +23,7 @@ principle_description: |
   7. Avoid matching by string, if some string is used as a key and used in several places and you need to every time type it, consider moving it to constant or Enum (if there are several keys)
   8. Avoid hardcode and magic numbers
     - This is soft rule, only hard violations should be reported
-    - For example there should be no local pathes or other hardcoded parameters left that you used for debugging. These parameters should be introduced to code using argparse.
+    - For example there should be no local paths or other hardcoded parameters left that you used for debugging. These parameters should be introduced to code using argparse.
     - The only exceptions where hard-coding allowed are tests. In tests you could use any magic numbers as you want (for testing purposes).
   9. Pydantic classes recommended:
     - Preferred way of organising classes is to be a BaseModel class with all fields required for logic accepted from outside rather than using complex initialisation logic
