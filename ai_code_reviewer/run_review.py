@@ -1,6 +1,8 @@
 import asyncio
 from typing import Dict, List
 
+from tqdm.asyncio import tqdm
+
 from ai_code_reviewer.review import FileDiffComments
 from ai_code_reviewer.reviewers.base import Reviewer
 
@@ -31,11 +33,15 @@ async def run_principle_reviewer(
 
 async def get_reviews(
         per_file_diff: Dict[str, str],
-        reviewers: List[Reviewer]
+        reviewers: List[Reviewer],
+        report_progress: bool = True
 ) -> List[FileDiffReview]:
     coroutines = []
     for reviewer in reviewers:
         for file_name, file_diff in per_file_diff.items():
             coroutines.append(run_principle_reviewer(reviewer, file_name, file_diff))
-    per_file_reviews: List[FileDiffReview] = list(await asyncio.gather(*coroutines))
+    if report_progress:
+        per_file_reviews: List[FileDiffReview] = list(await tqdm.gather(*coroutines, desc="Review in progress"))
+    else:
+        per_file_reviews: List[FileDiffReview] = list(await asyncio.gather(*coroutines))
     return per_file_reviews
